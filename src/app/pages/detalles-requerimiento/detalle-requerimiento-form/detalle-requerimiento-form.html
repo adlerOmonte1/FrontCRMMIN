@@ -1,0 +1,45 @@
+<h1 class="h3 mb-1">{{ editando ? 'Editar' : 'Nuevo' }} ítem de requerimiento</h1>
+<p class="text-body-secondary mb-3">{{ etiquetaRequerimiento() }}</p>
+
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando ítem…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="detalle-req-nombre">Nombre del ítem</label>
+      <input type="text" id="detalle-req-nombre" class="form-control" formControlName="nombre" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-req-cantidad">Cantidad</label>
+      <input type="text" id="detalle-req-cantidad" class="form-control" formControlName="cantidad" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-req-tipo">Tipo</label>
+      <select id="detalle-req-tipo" class="form-select" formControlName="tipo">
+        @for (opcion of tipos; track opcion.valor) {
+          <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+        }
+      </select>
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a [routerLink]="['/requerimientos', idRequerimiento, 'items']" class="btn btn-outline-secondary">
+        Cancelar
+      </a>
+    </div>
+  </form>
+}

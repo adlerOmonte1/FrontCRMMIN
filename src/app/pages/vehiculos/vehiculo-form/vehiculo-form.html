@@ -1,1 +1,56 @@
-<p>vehiculo-form works!</p>
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} vehículo</h1>
+
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando vehículo…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-md-6">
+      <label class="form-label" for="vehiculo-placa">Placa</label>
+      <input type="text" id="vehiculo-placa" class="form-control" formControlName="placa" maxlength="10" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="vehiculo-marca">Marca</label>
+      <input type="text" id="vehiculo-marca" class="form-control" formControlName="marca" maxlength="8" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="vehiculo-modelo">Modelo</label>
+      <input type="text" id="vehiculo-modelo" class="form-control" formControlName="modelo" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="vehiculo-color">Color</label>
+      <input type="text" id="vehiculo-color" class="form-control" formControlName="color" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="vehiculo-tara">Tara (peso vacío, kg)</label>
+      <input
+        type="text"
+        id="vehiculo-tara"
+        class="form-control"
+        inputmode="decimal"
+        formControlName="tara"
+        placeholder="0.00"
+      />
+      <div class="form-text">Equivale a {{ taraToneladas() }} t.</div>
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/vehiculos" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

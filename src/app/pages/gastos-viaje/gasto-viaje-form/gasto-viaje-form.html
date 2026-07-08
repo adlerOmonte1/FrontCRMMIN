@@ -1,0 +1,62 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} gasto de viaje</h1>
+
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="gasto-ticket">Ticket</label>
+      <select id="gasto-ticket" class="form-select" formControlName="ticket">
+        <option value="" disabled>Selecciona un ticket…</option>
+        @for (opcion of tickets(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="gasto-descripcion">Descripción (opcional)</label>
+      <input type="text" id="gasto-descripcion" class="form-control" formControlName="descripcion" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="gasto-consumo">Consumo (galones)</label>
+      <input
+        type="text"
+        id="gasto-consumo"
+        class="form-control"
+        inputmode="decimal"
+        formControlName="consumo"
+        placeholder="0.00"
+      />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="gasto-monto">Monto</label>
+      <input
+        type="text"
+        id="gasto-monto"
+        class="form-control"
+        inputmode="decimal"
+        formControlName="monto"
+        placeholder="0.00"
+      />
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/gastos-viaje" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

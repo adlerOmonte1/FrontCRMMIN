@@ -1,0 +1,52 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} requerimiento</h1>
+
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="requerimiento-encargado">Encargado</label>
+      <select id="requerimiento-encargado" class="form-select" formControlName="encargado">
+        <option value="" disabled>Selecciona un encargado…</option>
+        @for (opcion of encargados(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="requerimiento-estado">Estado</label>
+      <select id="requerimiento-estado" class="form-select" formControlName="estado">
+        @for (estado of estados; track estado) {
+          <option [value]="estado">{{ estado }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      @if (!editando) {
+        <div class="form-text">
+          Después de guardar, vas a poder agregar los ítems solicitados (insumos o herramientas).
+        </div>
+      } @else {
+        <div class="form-text">La fecha se actualiza al momento de guardar (el backend usa "auto_now").</div>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : editando ? 'Guardar' : 'Guardar y agregar ítems' }}
+      </button>
+      <a routerLink="/requerimientos" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

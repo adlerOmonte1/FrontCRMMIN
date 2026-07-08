@@ -1,13 +1,14 @@
-.app-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
+.app-sidebar {
+  --bs-offcanvas-width: 260px;
 }
 
-.app-header h1 {
-  margin: 0;
-  font-size: 1.25rem;
+@media (min-width: 992px) {
+  .app-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+  }
 }
 
 .app-main {
-  padding: 1.5rem;
+  min-width: 0;
 }

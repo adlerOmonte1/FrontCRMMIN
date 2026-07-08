@@ -1,0 +1,42 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} material</h1>
+
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando material…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-md-6">
+      <label class="form-label" for="material-nombre">Nombre</label>
+      <input type="text" id="material-nombre" class="form-control" formControlName="nombre" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="material-lugar">Lugar</label>
+      <input type="text" id="material-lugar" class="form-control" formControlName="lugar" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="material-tipo">Tipo</label>
+      <select id="material-tipo" class="form-select" formControlName="tipo">
+        @for (opcion of tipos; track opcion.valor) {
+          <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+        }
+      </select>
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/materiales" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

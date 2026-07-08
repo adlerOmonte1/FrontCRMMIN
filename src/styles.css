@@ -1,4 +1,8 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales. El diseño de la app usa Bootstrap 5 (ver angular.json)
+   para que todos los módulos compartan un mismo lenguaje visual y sean
+   responsivos "gratis" — este archivo solo cubre lo que Bootstrap no
+   define por sí mismo (tipografía base y ajustes puntuales del shell,
+   ver app.css). */
 
 :root {
   color-scheme: light;
@@ -8,58 +12,4 @@
     'Segoe UI',
     Roboto,
     sans-serif;
-}
-
-body {
-  margin: 0;
-}
-
-/* Clases base reutilizadas por las páginas de cada módulo (empleados, y el
-   resto que se agregue siguiendo el mismo patrón). Si llegan a necesitar
-   variantes o lógica propia, es la señal de extraerlas a un componente
-   compartido en app/shared/ en vez de seguir creciendo aquí. */
-
-.boton {
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.25rem;
-  background: #fff;
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.boton--primario {
-  background: #1a56db;
-  border-color: #1a56db;
-  color: #fff;
-}
-
-.boton--peligro {
-  background: #dc2626;
-  border-color: #dc2626;
-  color: #fff;
-}
-
-.boton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.tabla {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tabla th,
-.tabla td {
-  text-align: left;
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-.mensaje-error {
-  color: #dc2626;
 }

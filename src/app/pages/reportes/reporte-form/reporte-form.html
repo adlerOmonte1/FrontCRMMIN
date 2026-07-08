@@ -1,0 +1,47 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} reporte</h1>
+
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="reporte-encargado">Encargado</label>
+      <select id="reporte-encargado" class="form-select" formControlName="encargado">
+        <option value="" disabled>Selecciona un encargado…</option>
+        @for (opcion of encargados(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="reporte-descripcion">Descripción</label>
+      <textarea id="reporte-descripcion" class="form-control" formControlName="descripcion" rows="4"></textarea>
+    </div>
+
+    @if (editando) {
+      <div class="col-12">
+        <div class="form-text">
+          La fecha del reporte se actualiza al momento de guardar (el backend usa "auto_now"): al editar se pierde
+          la fecha original de creación.
+        </div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/reportes" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

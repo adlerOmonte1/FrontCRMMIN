@@ -16,9 +16,11 @@ flowchart LR
 - [Documentación completa](#documentación-completa)
 - [Stack tecnológico](#stack-tecnológico)
 - [Estructura del repositorio](#estructura-del-repositorio)
+- [Diseño y responsividad](#diseño-y-responsividad)
 - [Puesta en marcha](#puesta-en-marcha)
 - [Variables de entorno](#variables-de-entorno)
 - [Convenciones de nombres](#convenciones-de-nombres)
+- [Módulos implementados](#módulos-implementados)
 - [Estado actual del proyecto](#estado-actual-del-proyecto)
 - [Scripts disponibles](#scripts-disponibles)
 
@@ -26,9 +28,9 @@ flowchart LR
 
 | # | Documento | Contenido |
 |---|---|---|
-| 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales) |
+| 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales, selects con FK) |
 | 2 | [Flujo del código](docs/02-flujo-codigo-frontend.md) | Recorrido línea por línea de una acción real (crear y listar empleados): componente → servicio → interceptor → HTTP → backend |
-| 3 | [Guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso para replicar el patrón de `empleados` en las 14 entidades restantes del backend, con tabla de referencia completa |
+| 3 | [Guía del patrón de módulo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso del patrón que siguen los 15 módulos (útil para modificar uno existente o si el backend agrega una entidad nueva), con tabla de referencia completa |
 
 Estos documentos asumen que ya leíste (o tenés a mano) la documentación del backend `GestionMinera` — en particular su diccionario de datos y su documento de arquitectura técnica — ya que el frontend refleja esos contratos de datos, no los redefine.
 
@@ -38,6 +40,7 @@ Estos documentos asumen que ya leíste (o tenés a mano) la documentación del b
 |---|---|---|
 | Framework | Angular (standalone, sin NgModules) | 21 |
 | Lenguaje | TypeScript | 5.9 |
+| UI / diseño | Bootstrap 5 (CSS + JS del bundle, sin jQuery) | 5.3 |
 | Reactividad / estado local | Signals (`signal()`) | — |
 | Formularios | Reactive Forms (`ReactiveFormsModule`) | — |
 | HTTP | `HttpClient` + interceptores funcionales | — |
@@ -50,23 +53,33 @@ Estos documentos asumen que ya leíste (o tenés a mano) la documentación del b
 erp-minero/
 ├── src/
 │   ├── app/
-│   │   ├── core/                 # Infraestructura transversal (un único cliente HTTP, interceptores)
+│   │   ├── core/                 # Infraestructura transversal (cliente HTTP genérico, interceptor de auth, config de navegación)
 │   │   │   ├── services/api.ts
-│   │   │   └── interceptors/api-key-interceptor.ts
-│   │   ├── models/                # Contratos de datos (uno por entidad + paginación genérica)
-│   │   ├── services/               # Un servicio de acceso a datos por entidad (EmpleadoService, ...)
-│   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio
-│   │   │   └── empleados/
+│   │   │   ├── interceptors/api-key-interceptor.ts
+│   │   │   └── nav-modulos.ts
+│   │   ├── models/                # Contratos de datos: uno por entidad + PaginatedResponse<T> + OpcionSelect
+│   │   ├── services/               # Un servicio de acceso a datos por entidad (15 en total)
+│   │   ├── shared/                 # Funciones puras reutilizables sin estado (búsqueda, conversión de peso, fechas)
+│   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio (15 carpetas)
 │   │   ├── app.config.ts           # Providers globales (router, HttpClient, interceptores)
-│   │   ├── app.routes.ts           # Rutas de la aplicación
-│   │   └── app.ts                  # Shell raíz (header + <router-outlet>)
+│   │   ├── app.routes.ts           # Rutas de la aplicación (list/nuevo/:id/editar por entidad)
+│   │   └── app.ts                  # Shell raíz (nav lateral agrupada + <router-outlet>)
 │   ├── environments/                # environment.ts (dev) / environment.prod.ts
-│   └── styles.css                   # Estilos globales mínimos compartidos (botones, tabla, mensajes)
+│   └── styles.css                   # Solo tipografía base — el resto del diseño es Bootstrap directo en los templates
 ├── docs/                             # Esta documentación
-└── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, ...)
+└── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, @shared, ...)
 ```
 
 Ver el detalle de **por qué** está organizado así en [Arquitectura del frontend](docs/01-arquitectura-frontend.md).
+
+## Diseño y responsividad
+
+Todo el diseño usa **Bootstrap 5** directo en los templates (`btn`, `form-control`/`form-select`, `table table-responsive`, `alert`, `card`, `badge`, `input-group`, `offcanvas`) — no hay un sistema de clases propio paralelo. `src/styles.css` prácticamente no tiene nada: el look de la app es Bootstrap, sin capa de abstracción encima.
+
+- **Shell**: navbar superior fija (`sticky-top`) + sidebar de navegación. El sidebar usa `offcanvas-lg` de Bootstrap: en pantallas ≥ 992px es una columna fija y visible; por debajo de eso se convierte en un panel deslizable que se abre con el botón hamburguesa de la navbar. No hay JavaScript de Angular manejando esto — es 100% el bundle de Bootstrap (`data-bs-toggle`, `data-bs-dismiss`) cargado en `angular.json`.
+- **Listados**: tabla envuelta en `.table-responsive` para que en mobile el scroll sea horizontal *dentro* de la tabla, no de toda la página.
+- **Formularios**: grid de Bootstrap (`row g-3` + `col-md-6`/`col-12`) — dos columnas en pantallas medianas o más, una sola columna apilada en mobile, sin media queries manuales.
+- **Casos especiales**: el selector "Máquina/Insumo" y "Máquina/Volquete" (`DetalleInventarioForm`, `MantenimientoForm`) usa `form-check-inline`; el botón "Ahora" y el "+ Nueva máquina" usan `input-group` (input + botón pegados); el alta inline de Máquina/Insumo se muestra en una `card`.
 
 ## Puesta en marcha
 
@@ -105,14 +118,32 @@ La API Key de desarrollo (`crm-minera-2024`) es la misma que ya está en texto p
 
 Este proyecto sigue el esquema de generación por defecto del Angular CLI 21 (sin sufijos de tipo en el nombre de archivo ni en la clase, p. ej. `api.ts` → `class Api`, no `api.service.ts` → `class ApiService`), con **una excepción deliberada**: los servicios de acceso a datos de cada entidad sí llevan el sufijo `.service.ts` / `Service` (p. ej. `empleado.service.ts` → `EmpleadoService`), porque el modelo ya ocupa el nombre "pelado" de la entidad (`models/empleado.ts` → `interface Empleado`). Sin el sufijo, ambos símbolos colisionarían al importarlos juntos en un mismo componente. El detalle completo está en [Arquitectura del frontend § Convenciones de nomenclatura](docs/01-arquitectura-frontend.md#4-convenciones-de-nomenclatura).
 
+## Módulos implementados
+
+Los 15 recursos del backend tienen su módulo completo (modelo + servicio + listar + crear + editar + eliminar), agrupados en la navegación igual que en la documentación del backend:
+
+| Módulo de negocio | Entidades |
+|---|---|
+| Personal y flota | Empleados, Conductores, Encargados, Vehículos |
+| Pesaje y transporte | Materiales, Tickets, Gastos de viaje |
+| Inventario | Inventarios (y sus detalles, vistos dentro de cada inventario), Máquinas, Insumos |
+| Mantenimiento | Mantenimientos |
+| Reportes | Reportes |
+| Requerimientos | Requerimientos (y sus ítems, vistos dentro de cada requerimiento) |
+
+Cada uno sigue exactamente el mismo patrón (documentado en [docs/03](docs/03-guia-nuevo-modulo.md)): `EmpleadoService` es el ejemplo de referencia más simple, `TicketForm` el más elaborado (4 selects con FK), y `DetalleInventarioForm`/`MantenimientoForm` son los que refuerzan en el cliente una regla de "uno u otro" que el backend no valida (máquina/insumo, máquina/volquete).
+
+`DetalleInventario` y `DetalleRequerimiento` no tienen entrada propia en el menú: solo tienen sentido dentro de un Inventario/Requerimiento puntual, así que se navega a ellos con "Ver detalles"/"Ver ítems" desde la fila correspondiente (`/inventarios/:id/detalles`, `/requerimientos/:id/items`) — ver [Arquitectura del frontend § Alcance de rutas anidadas](docs/01-arquitectura-frontend.md#6-manejo-de-datos).
+
 ## Estado actual del proyecto
 
-Esto es una demostración de configuración + un borrador, no una aplicación completa:
-
-- ✅ Configuración de entorno (environments, path aliases, interceptor de API Key, cliente HTTP genérico).
-- ✅ Módulo `empleados` como ejemplo end-to-end: listar, crear y eliminar, con manejo de error básico.
-- ⬜ Edición de empleados (`update`/`patch` ya existen en `EmpleadoService`, falta la pantalla).
-- ⬜ Los 14 recursos restantes del backend (conductores, vehículos, tickets, inventario, mantenimiento, reportes, requerimientos, etc.) — ver la [guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) para replicar el patrón.
+- ✅ Los 15 módulos con CRUD completo: listar (paginado, con búsqueda client-side), crear, **editar**, eliminar.
+- ✅ Selects de relaciones (FK) resueltos a etiquetas legibles uniendo datos del lado del cliente (`listConLabel()` en cada servicio) — el backend no serializa anidado.
+- ✅ Reglas de negocio no validadas por el backend, reforzadas en el cliente: "máquina o insumo" (`DetalleInventarioForm`), "máquina o volquete" (`MantenimientoForm`).
+- ✅ Los detalles de Inventario y los ítems de Requerimientos están acotados a su cabecera (rutas anidadas `inventarios/:id/detalles`, `requerimientos/:id/items`), no a una lista global.
+- ✅ Alta inline de Máquina/Insumo desde el formulario de detalle de inventario, sin salir a otro módulo.
+- ✅ Peso mostrado también en toneladas (tara de vehículo, peso bruto/neto de tickets), recalculado en vivo en los formularios.
+- ✅ Acción rápida "Atendido" en Requerimientos (`PATCH` directo, sin pasar por el formulario completo).
 - ⬜ Manejo de errores global (hoy cada componente atrapa sus propios errores; no hay interceptor de errores ni página 404).
 - ⬜ Autenticación de usuario individual — hoy, igual que el backend, toda la app comparte una única API Key (no hay login ni roles en el cliente).
 

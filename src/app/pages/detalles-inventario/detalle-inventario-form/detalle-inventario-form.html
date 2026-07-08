@@ -1,0 +1,213 @@
+<h1 class="h3 mb-1">{{ editando ? 'Editar' : 'Nuevo' }} detalle de inventario</h1>
+<p class="text-body-secondary mb-3">{{ etiquetaInventario() }}</p>
+
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <span class="form-label d-block">¿Qué se está contando?</span>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="tipoItem"
+          id="tipoItem-maquina"
+          [checked]="tipoItem() === 'maquina'"
+          (change)="seleccionarTipo('maquina')"
+        />
+        <label class="form-check-label" for="tipoItem-maquina">Máquina</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="tipoItem"
+          id="tipoItem-insumo"
+          [checked]="tipoItem() === 'insumo'"
+          (change)="seleccionarTipo('insumo')"
+        />
+        <label class="form-check-label" for="tipoItem-insumo">Insumo</label>
+      </div>
+    </div>
+
+    @if (tipoItem() === 'maquina') {
+      <div class="col-12">
+        <label class="form-label" for="detalle-maquina">Máquina</label>
+        <div class="input-group">
+          <select id="detalle-maquina" class="form-select" formControlName="maquina">
+            <option value="" disabled>Selecciona una máquina…</option>
+            @for (opcion of maquinas(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+          <button type="button" class="btn btn-outline-secondary" (click)="mostrarFormMaquina()">
+            + Nueva máquina
+          </button>
+        </div>
+      </div>
+
+      @if (mostrandoFormMaquina()) {
+        <div class="col-12">
+          <div class="card card-body bg-body-tertiary">
+            <div class="row g-3" [formGroup]="formularioMaquinaNueva">
+              <div class="col-12">
+                <label class="form-label" for="maquina-nueva-nombre">Nombre</label>
+                <input type="text" id="maquina-nueva-nombre" class="form-control" formControlName="nombre" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="maquina-nueva-marca">Marca (opcional)</label>
+                <input type="text" id="maquina-nueva-marca" class="form-control" formControlName="marca" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="maquina-nueva-nro_serie">N° de serie (opcional)</label>
+                <input
+                  type="text"
+                  id="maquina-nueva-nro_serie"
+                  class="form-control"
+                  formControlName="nro_serie"
+                />
+              </div>
+              <div class="col-12 d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  [disabled]="guardandoItemNuevo()"
+                  (click)="guardarNuevaMaquina()"
+                >
+                  {{ guardandoItemNuevo() ? 'Creando…' : 'Crear máquina' }}
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelarFormMaquina()">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="col-12">
+        <label class="form-label" for="detalle-insumo">Insumo</label>
+        <div class="input-group">
+          <select id="detalle-insumo" class="form-select" formControlName="insumo">
+            <option value="" disabled>Selecciona un insumo…</option>
+            @for (opcion of insumos(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+          <button type="button" class="btn btn-outline-secondary" (click)="mostrarFormInsumo()">
+            + Nuevo insumo
+          </button>
+        </div>
+      </div>
+
+      @if (mostrandoFormInsumo()) {
+        <div class="col-12">
+          <div class="card card-body bg-body-tertiary">
+            <div class="row g-3" [formGroup]="formularioInsumoNuevo">
+              <div class="col-12">
+                <label class="form-label" for="insumo-nuevo-nombre">Nombre</label>
+                <input type="text" id="insumo-nuevo-nombre" class="form-control" formControlName="nombre" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="insumo-nuevo-categoria">Categoría</label>
+                <select id="insumo-nuevo-categoria" class="form-select" formControlName="categoria">
+                  @for (opcion of categoriasInsumo; track opcion.valor) {
+                    <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+                  }
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="insumo-nuevo-medida">Medida (opcional)</label>
+                <input type="text" id="insumo-nuevo-medida" class="form-control" formControlName="medida" />
+              </div>
+              <div class="col-12 d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  [disabled]="guardandoItemNuevo()"
+                  (click)="guardarNuevoInsumo()"
+                >
+                  {{ guardandoItemNuevo() ? 'Creando…' : 'Crear insumo' }}
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelarFormInsumo()">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-cantidad">Cantidad</label>
+      <input type="text" id="detalle-cantidad" class="form-control" formControlName="cantidad" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-estado">Estado</label>
+      <input
+        type="text"
+        id="detalle-estado"
+        class="form-control"
+        formControlName="estado"
+        placeholder="p. ej. operativo, de baja…"
+      />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-fecha_adquision">Fecha de adquisición</label>
+      <div class="input-group">
+        <input
+          type="datetime-local"
+          id="detalle-fecha_adquision"
+          class="form-control"
+          formControlName="fecha_adquision"
+        />
+        <button type="button" class="btn btn-outline-secondary" (click)="establecerFechaAdquisionAhora()">
+          Ahora
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-fecha_fin">Fecha de fin (opcional)</label>
+      <div class="input-group">
+        <input type="datetime-local" id="detalle-fecha_fin" class="form-control" formControlName="fecha_fin" />
+        <button type="button" class="btn btn-outline-secondary" (click)="establecerFechaFinAhora()">Ahora</button>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="detalle-ubicacion">Ubicación</label>
+      <input type="text" id="detalle-ubicacion" class="form-control" formControlName="ubicacion" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-descripcion">Descripción</label>
+      <input type="text" id="detalle-descripcion" class="form-control" formControlName="descripcion" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="detalle-observacion">Observación</label>
+      <input type="text" id="detalle-observacion" class="form-control" formControlName="observacion" />
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a [routerLink]="['/inventarios', idInventario, 'detalles']" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

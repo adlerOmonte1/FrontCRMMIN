@@ -1,14 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Empleado } from '@models/empleado';
 import { EmpleadoService } from '@services/empleado.service';
+import { coincideTexto } from '@shared/busqueda';
 
 @Component({
   selector: 'app-empleado-list',
   imports: [RouterLink],
   templateUrl: './empleado-list.html',
-  styleUrl: './empleado-list.css',
 })
 export class EmpleadoList {
   private readonly empleadoService = inject(EmpleadoService);
@@ -16,6 +16,13 @@ export class EmpleadoList {
   protected readonly empleados = signal<Empleado[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly empleadosFiltrados = computed(() =>
+    this.empleados().filter((e) =>
+      coincideTexto(this.busqueda(), e.nombre, e.apellido, e.dni, e.edad, e.especialidad),
+    ),
+  );
 
   constructor() {
     this.cargarEmpleados();

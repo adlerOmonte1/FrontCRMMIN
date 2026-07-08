@@ -1,0 +1,38 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} encargado</h1>
+
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando encargado…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="encargado-empleado">Empleado</label>
+      <select id="encargado-empleado" class="form-select" formControlName="empleado">
+        <option value="" disabled>Selecciona un empleado…</option>
+        @for (opcion of empleados(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="encargado-area">Área</label>
+      <input type="text" id="encargado-area" class="form-control" formControlName="area" />
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/encargados" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

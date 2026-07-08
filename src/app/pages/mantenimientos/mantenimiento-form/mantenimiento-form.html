@@ -1,0 +1,105 @@
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} mantenimiento</h1>
+
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="mantenimiento-encargado">Encargado</label>
+      <select id="mantenimiento-encargado" class="form-select" formControlName="encargado">
+        <option value="" disabled>Selecciona un encargado…</option>
+        @for (opcion of encargados(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-12">
+      <span class="form-label d-block">¿A qué se le da mantenimiento?</span>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="tipoObjetivo"
+          id="tipoObjetivo-maquina"
+          [checked]="tipoObjetivo() === 'maquina'"
+          (change)="seleccionarTipo('maquina')"
+        />
+        <label class="form-check-label" for="tipoObjetivo-maquina">Máquina</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="tipoObjetivo"
+          id="tipoObjetivo-volquete"
+          [checked]="tipoObjetivo() === 'volquete'"
+          (change)="seleccionarTipo('volquete')"
+        />
+        <label class="form-check-label" for="tipoObjetivo-volquete">Vehículo (volquete)</label>
+      </div>
+    </div>
+
+    @if (tipoObjetivo() === 'maquina') {
+      <div class="col-12">
+        <label class="form-label" for="mantenimiento-maquina">Máquina</label>
+        <select id="mantenimiento-maquina" class="form-select" formControlName="maquina">
+          <option value="" disabled>Selecciona una máquina…</option>
+          @for (opcion of maquinas(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </div>
+    } @else {
+      <div class="col-12">
+        <label class="form-label" for="mantenimiento-volquete">Vehículo</label>
+        <select id="mantenimiento-volquete" class="form-select" formControlName="volquete">
+          <option value="" disabled>Selecciona un vehículo…</option>
+          @for (opcion of vehiculos(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="col-md-6">
+      <label class="form-label" for="mantenimiento-fecha">Fecha</label>
+      <input type="date" id="mantenimiento-fecha" class="form-control" formControlName="fecha" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="mantenimiento-costo">Costo (opcional)</label>
+      <input
+        type="text"
+        id="mantenimiento-costo"
+        class="form-control"
+        inputmode="decimal"
+        formControlName="costo"
+        placeholder="0.00"
+      />
+    </div>
+
+    <div class="col-12">
+      <label class="form-label" for="mantenimiento-descripcion">
+        Descripción (opcional — por defecto "Sin descripción")
+      </label>
+      <input type="text" id="mantenimiento-descripcion" class="form-control" formControlName="descripcion" />
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/mantenimientos" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

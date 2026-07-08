@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
+import { expand, map, reduce } from 'rxjs/operators';
 
 import { environment } from '@environments/environment';
 import { PaginatedResponse } from '@models/pagination';
@@ -15,6 +16,18 @@ export class Api {
   list<T>(resource: string, page?: number): Observable<PaginatedResponse<T>> {
     const params = page ? new HttpParams().set('page', page) : undefined;
     return this.http.get<PaginatedResponse<T>>(this.buildUrl(resource), { params });
+  }
+
+  /**
+   * Recorre todas las páginas de un recurso (siguiendo `next`) y devuelve el
+   * total en un solo array. Pensado para poblar selects de un formulario
+   * (p. ej. "elegí un empleado"), donde 20 resultados no alcanzan.
+   */
+  listAll<T>(resource: string): Observable<T[]> {
+    return this.list<T>(resource).pipe(
+      expand((response) => (response.next ? this.getAbsolute<PaginatedResponse<T>>(response.next) : EMPTY)),
+      reduce<PaginatedResponse<T>, T[]>((acumulado, response) => [...acumulado, ...response.results], []),
+    );
   }
 
   getById<T>(resource: string, id: number): Observable<T> {
@@ -35,6 +48,10 @@ export class Api {
 
   remove(resource: string, id: number): Observable<void> {
     return this.http.delete<void>(this.buildUrl(resource, id));
+  }
+
+  private getAbsolute<T>(url: string): Observable<T> {
+    return this.http.get<T>(url);
   }
 
   private buildUrl(resource: string, id?: number): string {

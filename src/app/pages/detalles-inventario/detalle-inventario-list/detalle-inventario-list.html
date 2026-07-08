@@ -1,0 +1,69 @@
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+  <div>
+    <a routerLink="/inventarios" class="btn btn-sm btn-outline-secondary mb-1">← Inventarios</a>
+    <h1 class="h3 mb-0">{{ etiquetaInventario() }}</h1>
+  </div>
+  <a [routerLink]="['/inventarios', idInventario, 'detalles', 'nuevo']" class="btn btn-primary">
+    + Nuevo detalle
+  </a>
+</div>
+
+@if (cargando()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando detalles…</span>
+  </div>
+} @else if (error()) {
+  <div class="alert alert-danger" role="alert">{{ error() }}</div>
+} @else {
+  <input
+    type="search"
+    class="form-control mb-3"
+    placeholder="Buscar por ítem, ubicación, estado…"
+    [value]="busqueda()"
+    (input)="busqueda.set($any($event.target).value)"
+  />
+
+  @if (detalles().length === 0) {
+    <p class="text-body-secondary">Este inventario todavía no tiene detalles registrados.</p>
+  } @else if (detallesFiltrados().length === 0) {
+    <p class="text-body-secondary">No se encontraron detalles para "{{ busqueda() }}".</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Ítem</th>
+            <th>Cantidad</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (detalle of detallesFiltrados(); track detalle.id) {
+            <tr>
+              <td>{{ detalle.etiquetaItem }}</td>
+              <td>{{ detalle.cantidad }}</td>
+              <td>{{ detalle.ubicacion }}</td>
+              <td>{{ detalle.estado }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm" role="group">
+                  <a
+                    [routerLink]="['/inventarios', idInventario, 'detalles', detalle.id, 'editar']"
+                    class="btn btn-outline-secondary"
+                  >
+                    Editar
+                  </a>
+                  <button type="button" class="btn btn-outline-danger" (click)="eliminar(detalle)">
+                    Eliminar
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
