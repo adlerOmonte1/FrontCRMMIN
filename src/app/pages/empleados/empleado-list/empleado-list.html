@@ -1,0 +1,43 @@
+<section class="empleados">
+  <header class="empleados__header">
+    <h1>Empleados</h1>
+    <a routerLink="/empleados/nuevo" class="boton boton--primario">+ Nuevo empleado</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando empleados…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (empleados().length === 0) {
+    <p>No hay empleados registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>DNI</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Edad</th>
+          <th>Especialidad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (empleado of empleados(); track empleado.id) {
+          <tr>
+            <td>{{ empleado.dni }}</td>
+            <td>{{ empleado.nombre }}</td>
+            <td>{{ empleado.apellido }}</td>
+            <td>{{ empleado.edad }}</td>
+            <td>{{ empleado.especialidad }}</td>
+            <td>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(empleado)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
