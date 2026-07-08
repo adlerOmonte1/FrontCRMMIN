@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { Reporte } from '@models/reporte';
 import { EncargadoService } from '@services/encargado.service';
 import { ReporteService } from '@services/reporte.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface ReporteFila extends Reporte {
   nombreEncargado: string;
@@ -23,6 +24,11 @@ export class ReporteList {
   protected readonly reportes = signal<ReporteFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly reportesFiltrados = computed(() =>
+    this.reportes().filter((r) => coincideTexto(this.busqueda(), r.nombreEncargado, r.descripcion)),
+  );
 
   constructor() {
     this.cargarReportes();

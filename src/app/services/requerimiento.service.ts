@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { Api } from '@core/services/api';
 import { OpcionSelect } from '@models/opcion-select';
 import { PaginatedResponse } from '@models/pagination';
-import { Requerimiento } from '@models/requerimiento';
+import { ESTADO_ATENDIDO, Requerimiento } from '@models/requerimiento';
 
 export type RequerimientoCreacion = Omit<Requerimiento, 'id' | 'fecha'>;
 
@@ -38,6 +38,11 @@ export class RequerimientoService {
 
   remove(id: number): Observable<void> {
     return this.api.remove(this.resource, id);
+  }
+
+  /** Acción rápida del listado: marca el requerimiento como atendido sin pasar por el formulario completo. */
+  marcarComoAtendido(id: number): Observable<Requerimiento> {
+    return this.api.patch<Requerimiento>(this.resource, id, { estado: ESTADO_ATENDIDO });
   }
 
   /** Opciones para un <select> (usadas por DetalleRequerimiento al elegir a qué cabecera pertenece). */

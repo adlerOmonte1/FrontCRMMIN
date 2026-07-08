@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { Conductor } from '@models/conductor';
 import { ConductorService } from '@services/conductor.service';
 import { EmpleadoService } from '@services/empleado.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface ConductorFila extends Conductor {
   nombreEmpleado: string;
@@ -22,6 +23,11 @@ export class ConductorList {
   protected readonly conductores = signal<ConductorFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly conductoresFiltrados = computed(() =>
+    this.conductores().filter((c) => coincideTexto(this.busqueda(), c.nombreEmpleado, c.licencia, c.tipoLic)),
+  );
 
   constructor() {
     this.cargarConductores();

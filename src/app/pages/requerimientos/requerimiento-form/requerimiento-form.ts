@@ -83,8 +83,7 @@ export class RequerimientoForm {
     }
 
     this.requerimientoService.create(payload).subscribe({
-      next: (creado) =>
-        this.router.navigate(['/detalles-requerimiento/nuevo'], { queryParams: { requerimiento: creado.id } }),
+      next: (creado) => this.router.navigate(['/requerimientos', creado.id, 'items', 'nuevo']),
       error: () => {
         this.error.set('No se pudo guardar el requerimiento. Verifica los datos e intenta de nuevo.');
         this.guardando.set(false);

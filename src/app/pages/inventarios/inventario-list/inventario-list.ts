@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { Inventario } from '@models/inventario';
 import { EncargadoService } from '@services/encargado.service';
 import { InventarioService } from '@services/inventario.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface InventarioFila extends Inventario {
   nombreEncargado: string;
@@ -23,6 +24,11 @@ export class InventarioList {
   protected readonly inventarios = signal<InventarioFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly inventariosFiltrados = computed(() =>
+    this.inventarios().filter((i) => coincideTexto(this.busqueda(), i.lugar, i.descripcion, i.nombreEncargado)),
+  );
 
   constructor() {
     this.cargarInventarios();

@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
-import { OpcionSelect } from '@models/opcion-select';
 import { TIPOS_DETALLE_REQUERIMIENTO, TipoDetalleRequerimiento } from '@models/detalle-requerimiento';
 import { DetalleRequerimientoService } from '@services/detalle-requerimiento.service';
 import { RequerimientoService } from '@services/requerimiento.service';
@@ -19,48 +18,33 @@ export class DetalleRequerimientoForm {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  protected readonly idRequerimiento = Number(this.route.snapshot.paramMap.get('idRequerimiento'));
   private readonly idEditando = this.route.snapshot.paramMap.get('id');
 
   protected readonly editando = this.idEditando !== null;
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
-  protected readonly cargandoOpciones = signal(true);
   protected readonly cargandoRegistro = signal(this.editando);
-  protected readonly requerimientos = signal<OpcionSelect[]>([]);
+  protected readonly etiquetaRequerimiento = signal('');
   protected readonly tipos = TIPOS_DETALLE_REQUERIMIENTO;
 
   protected readonly formulario = this.fb.nonNullable.group({
-    requerimiento: ['', Validators.required],
     nombre: ['', Validators.required],
     cantidad: ['', Validators.required],
     tipo: ['insumos' as TipoDetalleRequerimiento, Validators.required],
   });
 
   constructor() {
-    this.requerimientoService.listConLabel().subscribe({
-      next: (opciones) => {
-        this.requerimientos.set(opciones);
-        this.cargandoOpciones.set(false);
-
-        // Si venimos de "Guardar y agregar ítems" en el alta de un
-        // requerimiento, precarga esa cabecera (solo al crear, no al editar).
-        if (!this.editando) {
-          const idPreseleccionado = this.route.snapshot.queryParamMap.get('requerimiento');
-          if (idPreseleccionado) {
-            this.formulario.patchValue({ requerimiento: idPreseleccionado });
-          }
-        }
-      },
-      error: () => {
-        this.error.set('No se pudo cargar la lista de requerimientos para el selector.');
-        this.cargandoOpciones.set(false);
-      },
+    this.requerimientoService.getById(this.idRequerimiento).subscribe({
+      next: (requerimiento) =>
+        this.etiquetaRequerimiento.set(`Requerimiento #${requerimiento.id} — ${requerimiento.estado}`),
+      error: () => this.etiquetaRequerimiento.set(`Requerimiento #${this.idRequerimiento}`),
     });
 
     if (this.idEditando !== null) {
       this.detalleService.getById(Number(this.idEditando)).subscribe({
         next: (detalle) => {
-          this.formulario.patchValue({ ...detalle, requerimiento: String(detalle.requerimiento) });
+          this.formulario.patchValue({ nombre: detalle.nombre, cantidad: detalle.cantidad, tipo: detalle.tipo });
           this.cargandoRegistro.set(false);
         },
         error: () => {
@@ -79,7 +63,7 @@ export class DetalleRequerimientoForm {
 
     const valores = this.formulario.getRawValue();
     const payload = {
-      requerimiento: Number(valores.requerimiento),
+      requerimiento: this.idRequerimiento,
       nombre: valores.nombre,
       cantidad: valores.cantidad,
       tipo: valores.tipo,
@@ -93,7 +77,7 @@ export class DetalleRequerimientoForm {
       : this.detalleService.create(payload);
 
     peticion.subscribe({
-      next: () => this.router.navigate(['/detalles-requerimiento']),
+      next: () => this.router.navigate(['/requerimientos', this.idRequerimiento, 'items']),
       error: () => {
         this.error.set('No se pudo guardar el ítem. Verifica los datos e intenta de nuevo.');
         this.guardando.set(false);

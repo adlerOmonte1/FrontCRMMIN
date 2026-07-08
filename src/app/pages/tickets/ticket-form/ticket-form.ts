@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -9,6 +10,7 @@ import { EncargadoService } from '@services/encargado.service';
 import { MaterialService } from '@services/material.service';
 import { TicketService } from '@services/ticket.service';
 import { VehiculoService } from '@services/vehiculo.service';
+import { kgATon } from '@shared/peso';
 
 @Component({
   selector: 'app-ticket-form',
@@ -47,6 +49,12 @@ export class TicketForm {
     descripcion: [''],
     observaciones: [''],
   });
+
+  /** Se recalcula en vivo mientras se escribe el peso bruto — solo de presentación. */
+  private readonly pesoBrutoActual = toSignal(this.formulario.controls.pesoBruto.valueChanges, {
+    initialValue: this.formulario.controls.pesoBruto.value,
+  });
+  protected readonly pesoBrutoToneladas = computed(() => kgATon(this.pesoBrutoActual()));
 
   constructor() {
     forkJoin({

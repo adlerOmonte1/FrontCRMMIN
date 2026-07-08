@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
+import { MAQUINA_SIN_ESPECIFICAR } from '@models/maquina';
 import { MaquinaService } from '@services/maquina.service';
 
 @Component({
@@ -24,15 +25,19 @@ export class MaquinaForm {
 
   protected readonly formulario = this.fb.nonNullable.group({
     nombre: ['', Validators.required],
-    marca: ['', Validators.required],
-    nro_serie: ['', Validators.required],
+    marca: [''],
+    nro_serie: [''],
   });
 
   constructor() {
     if (this.idEditando !== null) {
       this.maquinaService.getById(Number(this.idEditando)).subscribe({
         next: (maquina) => {
-          this.formulario.patchValue(maquina);
+          this.formulario.patchValue({
+            nombre: maquina.nombre,
+            marca: maquina.marca === MAQUINA_SIN_ESPECIFICAR ? '' : maquina.marca,
+            nro_serie: maquina.nro_serie === MAQUINA_SIN_ESPECIFICAR ? '' : maquina.nro_serie,
+          });
           this.cargandoRegistro.set(false);
         },
         error: () => {
@@ -53,9 +58,14 @@ export class MaquinaForm {
     this.error.set(null);
 
     const valores = this.formulario.getRawValue();
+    const payload = {
+      nombre: valores.nombre,
+      marca: valores.marca || MAQUINA_SIN_ESPECIFICAR,
+      nro_serie: valores.nro_serie || MAQUINA_SIN_ESPECIFICAR,
+    };
     const peticion = this.idEditando
-      ? this.maquinaService.update(Number(this.idEditando), valores)
-      : this.maquinaService.create(valores);
+      ? this.maquinaService.update(Number(this.idEditando), payload)
+      : this.maquinaService.create(payload);
 
     peticion.subscribe({
       next: () => this.router.navigate(['/maquinas']),

@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Maquina } from '@models/maquina';
 import { MaquinaService } from '@services/maquina.service';
+import { coincideTexto } from '@shared/busqueda';
 
 @Component({
   selector: 'app-maquina-list',
@@ -15,6 +16,11 @@ export class MaquinaList {
   protected readonly maquinas = signal<Maquina[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly maquinasFiltradas = computed(() =>
+    this.maquinas().filter((m) => coincideTexto(this.busqueda(), m.nombre, m.marca, m.nro_serie)),
+  );
 
   constructor() {
     this.cargarMaquinas();

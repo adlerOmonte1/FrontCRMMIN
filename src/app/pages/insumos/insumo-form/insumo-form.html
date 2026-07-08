@@ -1,39 +1,42 @@
-<section class="insumo-form">
-  <h1>{{ editando ? 'Editar' : 'Nuevo' }} insumo</h1>
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} insumo</h1>
 
-  @if (cargandoRegistro()) {
-    <p>Cargando insumo…</p>
-  } @else {
-    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
-      <label>
-        Nombre
-        <input type="text" formControlName="nombre" />
-      </label>
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando insumo…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-12">
+      <label class="form-label" for="insumo-nombre">Nombre</label>
+      <input type="text" id="insumo-nombre" class="form-control" formControlName="nombre" />
+    </div>
 
-      <label>
-        Categoría
-        <select formControlName="categoria">
-          @for (opcion of categorias; track opcion.valor) {
-            <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
-          }
-        </select>
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="insumo-categoria">Categoría</label>
+      <select id="insumo-categoria" class="form-select" formControlName="categoria">
+        @for (opcion of categorias; track opcion.valor) {
+          <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+        }
+      </select>
+    </div>
 
-      <label>
-        Medida (opcional)
-        <input type="text" formControlName="medida" />
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="insumo-medida">Medida (opcional)</label>
+      <input type="text" id="insumo-medida" class="form-control" formControlName="medida" />
+    </div>
 
-      @if (error()) {
-        <p class="mensaje-error">{{ error() }}</p>
-      }
-
-      <div class="formulario__acciones">
-        <a routerLink="/insumos" class="boton">Cancelar</a>
-        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
-          {{ guardando() ? 'Guardando…' : 'Guardar' }}
-        </button>
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
       </div>
-    </form>
-  }
-</section>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/insumos" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

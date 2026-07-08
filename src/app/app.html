@@ -1,22 +1,62 @@
-<div class="app-layout">
-  <nav class="app-nav">
-    <h1 class="app-nav__titulo">{{ title }}</h1>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <div class="container-fluid">
+    <button
+      class="btn btn-outline-light d-lg-none me-2"
+      type="button"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#sidebarOffcanvas"
+      aria-controls="sidebarOffcanvas"
+      aria-label="Abrir menú"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand fw-semibold mb-0" routerLink="/empleados">{{ title }}</a>
+  </div>
+</nav>
 
-    @for (grupo of grupos; track grupo.titulo) {
-      <div class="app-nav__grupo">
-        <h2>{{ grupo.titulo }}</h2>
-        <ul>
-          @for (enlace of grupo.enlaces; track enlace.ruta) {
-            <li>
-              <a [routerLink]="enlace.ruta" routerLinkActive="activo">{{ enlace.etiqueta }}</a>
-            </li>
-          }
-        </ul>
-      </div>
-    }
-  </nav>
+<div class="d-flex align-items-start app-layout">
+  <div
+    class="offcanvas-lg offcanvas-start bg-body-tertiary border-end app-sidebar"
+    tabindex="-1"
+    id="sidebarOffcanvas"
+    aria-labelledby="sidebarOffcanvasLabel"
+  >
+    <div class="offcanvas-header border-bottom d-lg-none">
+      <h2 class="offcanvas-title h6 mb-0" id="sidebarOffcanvasLabel">Menú</h2>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="offcanvas"
+        data-bs-target="#sidebarOffcanvas"
+        aria-label="Cerrar"
+      ></button>
+    </div>
 
-  <main class="app-main">
+    <div class="offcanvas-body d-flex flex-column p-3">
+      @for (grupo of grupos; track grupo.titulo) {
+        <div class="mb-4">
+          <h2 class="text-uppercase text-body-secondary small fw-bold mb-2">{{ grupo.titulo }}</h2>
+          <ul class="nav nav-pills flex-column gap-1">
+            @for (enlace of grupo.enlaces; track enlace.ruta) {
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  [routerLink]="enlace.ruta"
+                  routerLinkActive="active"
+                  data-bs-dismiss="offcanvas"
+                  data-bs-target="#sidebarOffcanvas"
+                >
+                  {{ enlace.etiqueta }}
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+
+  <main class="flex-grow-1 p-3 p-lg-4 app-main">
     <router-outlet />
   </main>
 </div>

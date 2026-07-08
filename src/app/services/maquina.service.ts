@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Api } from '@core/services/api';
-import { Maquina } from '@models/maquina';
+import { MAQUINA_SIN_ESPECIFICAR, Maquina } from '@models/maquina';
 import { OpcionSelect } from '@models/opcion-select';
 import { PaginatedResponse } from '@models/pagination';
 
@@ -40,8 +40,15 @@ export class MaquinaService {
 
   /** Opciones para un <select> (usadas por DetalleInventario y Mantenimiento). */
   listConLabel(): Observable<OpcionSelect[]> {
-    return this.listAll().pipe(
-      map((maquinas) => maquinas.map((m) => ({ id: m.id, label: `${m.nombre} — ${m.marca} (S/N ${m.nro_serie})` }))),
-    );
+    return this.listAll().pipe(map((maquinas) => maquinas.map((m) => ({ id: m.id, label: this.armarLabel(m) }))));
+  }
+
+  private armarLabel(maquina: Maquina): string {
+    const detalles = [
+      maquina.marca !== MAQUINA_SIN_ESPECIFICAR ? maquina.marca : null,
+      maquina.nro_serie !== MAQUINA_SIN_ESPECIFICAR ? `S/N ${maquina.nro_serie}` : null,
+    ].filter((d): d is string => d !== null);
+
+    return detalles.length > 0 ? `${maquina.nombre} — ${detalles.join(', ')}` : maquina.nombre;
   }
 }

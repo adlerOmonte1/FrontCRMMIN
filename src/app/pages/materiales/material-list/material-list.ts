@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Material } from '@models/material';
 import { MaterialService } from '@services/material.service';
+import { coincideTexto } from '@shared/busqueda';
 
 @Component({
   selector: 'app-material-list',
@@ -15,6 +16,11 @@ export class MaterialList {
   protected readonly materiales = signal<Material[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly materialesFiltrados = computed(() =>
+    this.materiales().filter((m) => coincideTexto(this.busqueda(), m.nombre, m.lugar, m.tipo)),
+  );
 
   constructor() {
     this.cargarMateriales();

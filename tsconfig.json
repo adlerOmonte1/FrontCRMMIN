@@ -9,6 +9,7 @@
       "@models/*": ["src/app/models/*"],
       "@services/*": ["src/app/services/*"],
       "@pages/*": ["src/app/pages/*"],
+      "@shared/*": ["src/app/shared/*"],
       "@environments/*": ["src/environments/*"]
     },
     "strict": true,

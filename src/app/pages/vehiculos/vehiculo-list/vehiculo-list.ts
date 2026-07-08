@@ -1,7 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Vehiculo } from '@models/vehiculo';
 import { VehiculoService } from '@services/vehiculo.service';
+import { coincideTexto } from '@shared/busqueda';
+import { kgATon } from '@shared/peso';
 
 @Component({
   selector: 'app-vehiculo-list',
@@ -13,6 +15,13 @@ export class VehiculoList {
   protected readonly vehiculos = signal<Vehiculo[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly vehiculosFiltrados = computed(() =>
+    this.vehiculos().filter((v) => coincideTexto(this.busqueda(), v.placa, v.marca, v.modelo, v.color)),
+  );
+
+  protected readonly kgATon = kgATon;
 
   constructor() {
     this.cargarVehiculos();

@@ -126,21 +126,21 @@ export const routes: Routes = [
       import('./pages/inventarios/inventario-form/inventario-form').then((m) => m.InventarioForm),
   },
   {
-    path: 'detalles-inventario',
+    path: 'inventarios/:idInventario/detalles',
     loadComponent: () =>
       import('./pages/detalles-inventario/detalle-inventario-list/detalle-inventario-list').then(
         (m) => m.DetalleInventarioList,
       ),
   },
   {
-    path: 'detalles-inventario/nuevo',
+    path: 'inventarios/:idInventario/detalles/nuevo',
     loadComponent: () =>
       import('./pages/detalles-inventario/detalle-inventario-form/detalle-inventario-form').then(
         (m) => m.DetalleInventarioForm,
       ),
   },
   {
-    path: 'detalles-inventario/:id/editar',
+    path: 'inventarios/:idInventario/detalles/:id/editar',
     loadComponent: () =>
       import('./pages/detalles-inventario/detalle-inventario-form/detalle-inventario-form').then(
         (m) => m.DetalleInventarioForm,
@@ -231,21 +231,21 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'detalles-requerimiento',
+    path: 'requerimientos/:idRequerimiento/items',
     loadComponent: () =>
       import('./pages/detalles-requerimiento/detalle-requerimiento-list/detalle-requerimiento-list').then(
         (m) => m.DetalleRequerimientoList,
       ),
   },
   {
-    path: 'detalles-requerimiento/nuevo',
+    path: 'requerimientos/:idRequerimiento/items/nuevo',
     loadComponent: () =>
       import('./pages/detalles-requerimiento/detalle-requerimiento-form/detalle-requerimiento-form').then(
         (m) => m.DetalleRequerimientoForm,
       ),
   },
   {
-    path: 'detalles-requerimiento/:id/editar',
+    path: 'requerimientos/:idRequerimiento/items/:id/editar',
     loadComponent: () =>
       import('./pages/detalles-requerimiento/detalle-requerimiento-form/detalle-requerimiento-form').then(
         (m) => m.DetalleRequerimientoForm,

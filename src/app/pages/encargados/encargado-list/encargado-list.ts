@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { Encargado } from '@models/encargado';
 import { EncargadoService } from '@services/encargado.service';
 import { EmpleadoService } from '@services/empleado.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface EncargadoFila extends Encargado {
   nombreEmpleado: string;
@@ -22,6 +23,11 @@ export class EncargadoList {
   protected readonly encargados = signal<EncargadoFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly encargadosFiltrados = computed(() =>
+    this.encargados().filter((e) => coincideTexto(this.busqueda(), e.nombreEmpleado, e.area)),
+  );
 
   constructor() {
     this.cargarEncargados();

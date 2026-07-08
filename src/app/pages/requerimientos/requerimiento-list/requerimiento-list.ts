@@ -1,11 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { Requerimiento } from '@models/requerimiento';
+import { ESTADO_ATENDIDO, Requerimiento } from '@models/requerimiento';
 import { EncargadoService } from '@services/encargado.service';
 import { RequerimientoService } from '@services/requerimiento.service';
+import { coincideTexto } from '@shared/busqueda';
+import { claseBadgeEstado } from '@shared/estado-badge';
 
 interface RequerimientoFila extends Requerimiento {
   nombreEncargado: string;
@@ -23,9 +25,26 @@ export class RequerimientoList {
   protected readonly requerimientos = signal<RequerimientoFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+  protected readonly ESTADO_ATENDIDO = ESTADO_ATENDIDO;
+  protected readonly claseBadgeEstado = claseBadgeEstado;
+
+  protected readonly requerimientosFiltrados = computed(() =>
+    this.requerimientos().filter((r) => coincideTexto(this.busqueda(), r.nombreEncargado, r.estado)),
+  );
 
   constructor() {
     this.cargarRequerimientos();
+  }
+
+  protected marcarComoAtendido(requerimiento: Requerimiento): void {
+    this.requerimientoService.marcarComoAtendido(requerimiento.id).subscribe({
+      next: (actualizado) =>
+        this.requerimientos.update((lista) =>
+          lista.map((r) => (r.id === requerimiento.id ? { ...r, estado: actualizado.estado } : r)),
+        ),
+      error: () => this.error.set('No se pudo marcar el requerimiento como atendido.'),
+    });
   }
 
   protected eliminar(requerimiento: Requerimiento): void {

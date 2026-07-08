@@ -3,6 +3,11 @@
  * como los define la documentación del backend (GestionMinera/docs/01-
  * proyecto.md § Módulos funcionales). Vive en core/ porque es
  * configuración del shell de la app, no de ningún módulo en particular.
+ *
+ * "Detalles de inventario" e "Ítems solicitados" (detalle de Requerimientos)
+ * a propósito no tienen entrada acá: solo tienen sentido dentro de un
+ * Inventario/Requerimiento puntual, así que se llega a ellos con el botón
+ * "Ver detalles"/"Ver ítems" de cada fila, no como sección aparte del menú.
  */
 export interface EnlaceNav {
   ruta: string;
@@ -36,7 +41,6 @@ export const NAV_MODULOS: GrupoNav[] = [
     titulo: 'Inventario',
     enlaces: [
       { ruta: '/inventarios', etiqueta: 'Inventarios' },
-      { ruta: '/detalles-inventario', etiqueta: 'Detalles de inventario' },
       { ruta: '/maquinas', etiqueta: 'Máquinas' },
       { ruta: '/insumos', etiqueta: 'Insumos' },
     ],
@@ -51,9 +55,6 @@ export const NAV_MODULOS: GrupoNav[] = [
   },
   {
     titulo: 'Requerimientos',
-    enlaces: [
-      { ruta: '/requerimientos', etiqueta: 'Requerimientos' },
-      { ruta: '/detalles-requerimiento', etiqueta: 'Ítems solicitados' },
-    ],
+    enlaces: [{ ruta: '/requerimientos', etiqueta: 'Requerimientos' }],
   },
 ];

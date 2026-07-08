@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
@@ -7,6 +7,7 @@ import { EncargadoService } from '@services/encargado.service';
 import { MantenimientoService } from '@services/mantenimiento.service';
 import { MaquinaService } from '@services/maquina.service';
 import { VehiculoService } from '@services/vehiculo.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface MantenimientoFila extends Mantenimiento {
   nombreEncargado: string;
@@ -27,6 +28,13 @@ export class MantenimientoList {
   protected readonly mantenimientos = signal<MantenimientoFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly mantenimientosFiltrados = computed(() =>
+    this.mantenimientos().filter((m) =>
+      coincideTexto(this.busqueda(), m.nombreEncargado, m.etiquetaObjetivo, m.descripcion, m.fecha, m.costo),
+    ),
+  );
 
   constructor() {
     this.cargarMantenimientos();

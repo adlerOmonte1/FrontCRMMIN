@@ -1,14 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { DetalleRequerimiento } from '@models/detalle-requerimiento';
 import { DetalleRequerimientoService } from '@services/detalle-requerimiento.service';
 import { RequerimientoService } from '@services/requerimiento.service';
-
-interface DetalleRequerimientoFila extends DetalleRequerimiento {
-  etiquetaRequerimiento: string;
-}
+import { coincideTexto } from '@shared/busqueda';
 
 @Component({
   selector: 'app-detalle-requerimiento-list',
@@ -18,12 +14,27 @@ interface DetalleRequerimientoFila extends DetalleRequerimiento {
 export class DetalleRequerimientoList {
   private readonly detalleService = inject(DetalleRequerimientoService);
   private readonly requerimientoService = inject(RequerimientoService);
+  private readonly route = inject(ActivatedRoute);
 
-  protected readonly detalles = signal<DetalleRequerimientoFila[]>([]);
+  protected readonly idRequerimiento = Number(this.route.snapshot.paramMap.get('idRequerimiento'));
+
+  protected readonly etiquetaRequerimiento = signal('');
+  protected readonly detalles = signal<DetalleRequerimiento[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly detallesFiltrados = computed(() =>
+    this.detalles().filter((d) => coincideTexto(this.busqueda(), d.nombre, d.cantidad, d.tipo)),
+  );
 
   constructor() {
+    this.requerimientoService.getById(this.idRequerimiento).subscribe({
+      next: (requerimiento) =>
+        this.etiquetaRequerimiento.set(`Requerimiento #${requerimiento.id} — ${requerimiento.estado}`),
+      error: () => this.etiquetaRequerimiento.set(`Requerimiento #${this.idRequerimiento}`),
+    });
+
     this.cargarDetalles();
   }
 
@@ -43,18 +54,9 @@ export class DetalleRequerimientoList {
     this.cargando.set(true);
     this.error.set(null);
 
-    forkJoin({
-      detalles: this.detalleService.list(),
-      requerimientos: this.requerimientoService.listConLabel(),
-    }).subscribe({
-      next: ({ detalles, requerimientos }) => {
-        const etiquetaPorId = new Map(requerimientos.map((r) => [r.id, r.label]));
-        this.detalles.set(
-          detalles.results.map((d) => ({
-            ...d,
-            etiquetaRequerimiento: etiquetaPorId.get(d.requerimiento) ?? `Requerimiento #${d.requerimiento}`,
-          })),
-        );
+    this.detalleService.listAll().subscribe({
+      next: (detalles) => {
+        this.detalles.set(detalles.filter((d) => d.requerimiento === this.idRequerimiento));
         this.cargando.set(false);
       },
       error: () => {

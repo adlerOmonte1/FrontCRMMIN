@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
@@ -7,6 +7,7 @@ import { GastoViaje } from '@models/gasto-viaje';
 import { OpcionSelect } from '@models/opcion-select';
 import { GastoViajeService } from '@services/gasto-viaje.service';
 import { TicketService } from '@services/ticket.service';
+import { coincideTexto } from '@shared/busqueda';
 
 interface GastoViajeFila extends GastoViaje {
   etiquetaTicket: string;
@@ -24,6 +25,11 @@ export class GastoViajeList {
   protected readonly gastos = signal<GastoViajeFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly gastosFiltrados = computed(() =>
+    this.gastos().filter((g) => coincideTexto(this.busqueda(), g.etiquetaTicket, g.descripcion, g.consumo, g.monto)),
+  );
 
   constructor() {
     this.cargarGastos();

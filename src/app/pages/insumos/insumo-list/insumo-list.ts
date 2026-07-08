@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { Insumo } from '@models/insumo';
 import { InsumoService } from '@services/insumo.service';
+import { coincideTexto } from '@shared/busqueda';
 
 @Component({
   selector: 'app-insumo-list',
@@ -15,6 +16,11 @@ export class InsumoList {
   protected readonly insumos = signal<Insumo[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly insumosFiltrados = computed(() =>
+    this.insumos().filter((i) => coincideTexto(this.busqueda(), i.nombre, i.categoria, i.medida)),
+  );
 
   constructor() {
     this.cargarInsumos();

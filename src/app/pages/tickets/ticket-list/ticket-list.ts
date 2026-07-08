@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
@@ -10,6 +10,8 @@ import { EncargadoService } from '@services/encargado.service';
 import { MaterialService } from '@services/material.service';
 import { TicketService } from '@services/ticket.service';
 import { VehiculoService } from '@services/vehiculo.service';
+import { coincideTexto } from '@shared/busqueda';
+import { kgATon } from '@shared/peso';
 
 interface TicketFila extends Ticket {
   nombreConductor: string;
@@ -37,6 +39,23 @@ export class TicketList {
   protected readonly tickets = signal<TicketFila[]>([]);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly busqueda = signal('');
+
+  protected readonly ticketsFiltrados = computed(() =>
+    this.tickets().filter((t) =>
+      coincideTexto(
+        this.busqueda(),
+        t.id,
+        t.nombreConductor,
+        t.nombreVehiculo,
+        t.nombreEncargado,
+        t.nombreMaterial,
+        t.descripcion,
+      ),
+    ),
+  );
+
+  protected readonly kgATon = kgATon;
 
   constructor() {
     this.cargarTickets();

@@ -16,6 +16,7 @@ flowchart LR
 - [Documentación completa](#documentación-completa)
 - [Stack tecnológico](#stack-tecnológico)
 - [Estructura del repositorio](#estructura-del-repositorio)
+- [Diseño y responsividad](#diseño-y-responsividad)
 - [Puesta en marcha](#puesta-en-marcha)
 - [Variables de entorno](#variables-de-entorno)
 - [Convenciones de nombres](#convenciones-de-nombres)
@@ -39,6 +40,7 @@ Estos documentos asumen que ya leíste (o tenés a mano) la documentación del b
 |---|---|---|
 | Framework | Angular (standalone, sin NgModules) | 21 |
 | Lenguaje | TypeScript | 5.9 |
+| UI / diseño | Bootstrap 5 (CSS + JS del bundle, sin jQuery) | 5.3 |
 | Reactividad / estado local | Signals (`signal()`) | — |
 | Formularios | Reactive Forms (`ReactiveFormsModule`) | — |
 | HTTP | `HttpClient` + interceptores funcionales | — |
@@ -57,17 +59,27 @@ erp-minero/
 │   │   │   └── nav-modulos.ts
 │   │   ├── models/                # Contratos de datos: uno por entidad + PaginatedResponse<T> + OpcionSelect
 │   │   ├── services/               # Un servicio de acceso a datos por entidad (15 en total)
+│   │   ├── shared/                 # Funciones puras reutilizables sin estado (búsqueda, conversión de peso, fechas)
 │   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio (15 carpetas)
 │   │   ├── app.config.ts           # Providers globales (router, HttpClient, interceptores)
 │   │   ├── app.routes.ts           # Rutas de la aplicación (list/nuevo/:id/editar por entidad)
 │   │   └── app.ts                  # Shell raíz (nav lateral agrupada + <router-outlet>)
 │   ├── environments/                # environment.ts (dev) / environment.prod.ts
-│   └── styles.css                   # Estilos globales compartidos (botones, tabla, layout de formularios)
+│   └── styles.css                   # Solo tipografía base — el resto del diseño es Bootstrap directo en los templates
 ├── docs/                             # Esta documentación
-└── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, ...)
+└── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, @shared, ...)
 ```
 
 Ver el detalle de **por qué** está organizado así en [Arquitectura del frontend](docs/01-arquitectura-frontend.md).
+
+## Diseño y responsividad
+
+Todo el diseño usa **Bootstrap 5** directo en los templates (`btn`, `form-control`/`form-select`, `table table-responsive`, `alert`, `card`, `badge`, `input-group`, `offcanvas`) — no hay un sistema de clases propio paralelo. `src/styles.css` prácticamente no tiene nada: el look de la app es Bootstrap, sin capa de abstracción encima.
+
+- **Shell**: navbar superior fija (`sticky-top`) + sidebar de navegación. El sidebar usa `offcanvas-lg` de Bootstrap: en pantallas ≥ 992px es una columna fija y visible; por debajo de eso se convierte en un panel deslizable que se abre con el botón hamburguesa de la navbar. No hay JavaScript de Angular manejando esto — es 100% el bundle de Bootstrap (`data-bs-toggle`, `data-bs-dismiss`) cargado en `angular.json`.
+- **Listados**: tabla envuelta en `.table-responsive` para que en mobile el scroll sea horizontal *dentro* de la tabla, no de toda la página.
+- **Formularios**: grid de Bootstrap (`row g-3` + `col-md-6`/`col-12`) — dos columnas en pantallas medianas o más, una sola columna apilada en mobile, sin media queries manuales.
+- **Casos especiales**: el selector "Máquina/Insumo" y "Máquina/Volquete" (`DetalleInventarioForm`, `MantenimientoForm`) usa `form-check-inline`; el botón "Ahora" y el "+ Nueva máquina" usan `input-group` (input + botón pegados); el alta inline de Máquina/Insumo se muestra en una `card`.
 
 ## Puesta en marcha
 
@@ -114,22 +126,26 @@ Los 15 recursos del backend tienen su módulo completo (modelo + servicio + list
 |---|---|
 | Personal y flota | Empleados, Conductores, Encargados, Vehículos |
 | Pesaje y transporte | Materiales, Tickets, Gastos de viaje |
-| Inventario | Inventarios, Detalles de inventario, Máquinas, Insumos |
+| Inventario | Inventarios (y sus detalles, vistos dentro de cada inventario), Máquinas, Insumos |
 | Mantenimiento | Mantenimientos |
 | Reportes | Reportes |
-| Requerimientos | Requerimientos, Ítems solicitados (detalle) |
+| Requerimientos | Requerimientos (y sus ítems, vistos dentro de cada requerimiento) |
 
 Cada uno sigue exactamente el mismo patrón (documentado en [docs/03](docs/03-guia-nuevo-modulo.md)): `EmpleadoService` es el ejemplo de referencia más simple, `TicketForm` el más elaborado (4 selects con FK), y `DetalleInventarioForm`/`MantenimientoForm` son los que refuerzan en el cliente una regla de "uno u otro" que el backend no valida (máquina/insumo, máquina/volquete).
 
+`DetalleInventario` y `DetalleRequerimiento` no tienen entrada propia en el menú: solo tienen sentido dentro de un Inventario/Requerimiento puntual, así que se navega a ellos con "Ver detalles"/"Ver ítems" desde la fila correspondiente (`/inventarios/:id/detalles`, `/requerimientos/:id/items`) — ver [Arquitectura del frontend § Alcance de rutas anidadas](docs/01-arquitectura-frontend.md#6-manejo-de-datos).
+
 ## Estado actual del proyecto
 
-- ✅ Los 15 módulos con CRUD completo: listar (paginado), crear, **editar**, eliminar.
+- ✅ Los 15 módulos con CRUD completo: listar (paginado, con búsqueda client-side), crear, **editar**, eliminar.
 - ✅ Selects de relaciones (FK) resueltos a etiquetas legibles uniendo datos del lado del cliente (`listConLabel()` en cada servicio) — el backend no serializa anidado.
 - ✅ Reglas de negocio no validadas por el backend, reforzadas en el cliente: "máquina o insumo" (`DetalleInventarioForm`), "máquina o volquete" (`MantenimientoForm`).
-- ✅ Flujo cabecera-detalle asistido: al crear un `Requerimiento`, el formulario de su primer ítem llega con la cabecera preseleccionada.
+- ✅ Los detalles de Inventario y los ítems de Requerimientos están acotados a su cabecera (rutas anidadas `inventarios/:id/detalles`, `requerimientos/:id/items`), no a una lista global.
+- ✅ Alta inline de Máquina/Insumo desde el formulario de detalle de inventario, sin salir a otro módulo.
+- ✅ Peso mostrado también en toneladas (tara de vehículo, peso bruto/neto de tickets), recalculado en vivo en los formularios.
+- ✅ Acción rápida "Atendido" en Requerimientos (`PATCH` directo, sin pasar por el formulario completo).
 - ⬜ Manejo de errores global (hoy cada componente atrapa sus propios errores; no hay interceptor de errores ni página 404).
 - ⬜ Autenticación de usuario individual — hoy, igual que el backend, toda la app comparte una única API Key (no hay login ni roles en el cliente).
-- ⬜ Filtrado/búsqueda en las listas — el backend no lo soporta por query params (ver limitación documentada en el backend), así que cualquier filtro tendría que implementarse sobre los datos ya traídos al cliente.
 
 ## Scripts disponibles
 

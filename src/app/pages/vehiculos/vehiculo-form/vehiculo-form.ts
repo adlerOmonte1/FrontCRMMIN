@@ -1,8 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { VehiculoService } from '@services/vehiculo.service';
+import { kgATon } from '@shared/peso';
 
 @Component({
   selector: 'app-vehiculo-form',
@@ -29,6 +31,12 @@ export class VehiculoForm {
     modelo: ['', Validators.required],
     tara: ['0.00', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
   });
+
+  /** Se recalcula en vivo mientras el usuario escribe la tara — es solo de presentación, no se envía al backend. */
+  private readonly taraActual = toSignal(this.formulario.controls.tara.valueChanges, {
+    initialValue: this.formulario.controls.tara.value,
+  });
+  protected readonly taraToneladas = computed(() => kgATon(this.taraActual()));
 
   constructor() {
     if (this.idEditando !== null) {

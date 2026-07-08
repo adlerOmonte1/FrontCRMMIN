@@ -18,9 +18,9 @@ Los 15 recursos del backend ya están implementados en el frontend siguiendo exa
 
 1. **Modelo** — `src/app/models/<entidad>.ts` con una interfaz que refleje **exactamente** los campos del backend (mismo nombre, mismo tipo). Ver el diccionario de datos del backend para cada entidad. Recordar: los campos `Decimal` del backend son `string` en TypeScript, no `number` (ver [Arquitectura § Manejo de datos](01-arquitectura-frontend.md#6-manejo-de-datos)). Si el backend tiene un campo `Choice`, exportar también el tipo unión y un array de opciones (ver `models/material.ts` → `TipoMaterial` / `TIPOS_MATERIAL`).
 2. **Servicio** — `src/app/services/<entidad>.service.ts`, inyectando `Api` y exponiendo `list/listAll/getById/create/update/remove`. Si otra entidad va a referenciar esta por FK en un `<select>`, agregar también `listConLabel()` (ver [§3](#3-selects-con-fk-y-campos-mutuamente-excluyentes)). No agregar lógica nueva acá — si hace falta algo distinto de un CRUD estándar, probablemente el backend tampoco lo soporta.
-3. **Páginas** — `src/app/pages/<módulo>/<entidad>-list/` y `.../<entidad>-form/`. El mismo `<entidad>-form` sirve para crear y editar (ver [§3](#3-selects-con-fk-y-campos-mutuamente-excluyentes)).
-4. **Rutas** — tres por entidad en `app.routes.ts`, todas `loadComponent` (lazy): `recurso`, `recurso/nuevo`, `recurso/:id/editar` (esta última apunta al mismo `XForm` que `nuevo`).
-5. **Navegación** — agregar el enlace en el grupo correspondiente de `core/nav-modulos.ts` (`NAV_MODULOS`), no en el HTML del shell directamente.
+3. **Páginas** — `src/app/pages/<módulo>/<entidad>-list/` y `.../<entidad>-form/`. El mismo `<entidad>-form` sirve para crear y editar (ver [§3](#3-selects-con-fk-y-campos-mutuamente-excluyentes)). La lista lleva un signal `busqueda` + `computed` filtrando con `coincideTexto()` de `@shared/busqueda` — copiar el de `empleado-list.ts`, no reinventarlo.
+4. **Rutas** — tres por entidad en `app.routes.ts`, todas `loadComponent` (lazy): `recurso`, `recurso/nuevo`, `recurso/:id/editar` (esta última apunta al mismo `XForm` que `nuevo`). Si la entidad es el "detalle" de un patrón cabecera-detalle (como `DetalleInventario`/`DetalleRequerimiento`), las rutas van anidadas bajo la cabecera en vez de sueltas — ver [Arquitectura § Manejo de datos](01-arquitectura-frontend.md#6-manejo-de-datos).
+5. **Navegación** — agregar el enlace en el grupo correspondiente de `core/nav-modulos.ts` (`NAV_MODULOS`), no en el HTML del shell directamente. Si la entidad es un "detalle" acotado a una cabecera, no lleva enlace propio en el menú (se llega por "Ver detalles" desde la cabecera).
 
 Ninguno de estos pasos toca `core/services/api.ts` ni `core/interceptors/api-key-interceptor.ts`: esa es la señal de que el diseño está funcionando. Si un módulo nuevo "necesita" modificar `Api`, es una alerta para revisar el diseño antes de hacerlo.
 
@@ -122,7 +122,9 @@ Dos situaciones se repiten en varios módulos y vale la pena resolverlas siempre
 - [ ] Si otra entidad va a referenciar esta por FK, el servicio tiene `listConLabel()`.
 - [ ] Si la entidad tiene una FK opcional en pares como `maquina`/`insumo` o `maquina`/`volquete`, el formulario refuerza en el cliente la regla de "uno u otro" que el backend no valida.
 - [ ] Si la entidad es una "cabecera" de un patrón cabecera-detalle (`Inventario`, `Requerimientos`), considerar si el flujo de creación debe llevar directo a agregar el primer detalle (como hace `RequerimientoForm`).
+- [ ] Si la entidad es el "detalle" de ese patrón, sus rutas están anidadas bajo la cabecera (`cabecera/:id/detalles/...`) y filtra por esa cabecera con `Api.listAll()` + filtro en cliente, no trae la colección global.
 - [ ] El servicio no depende de filtrado por query params del backend (no existe).
+- [ ] La lista tiene su input de búsqueda (`coincideTexto`) sobre los campos relevantes de esa entidad.
 - [ ] El formulario soporta edición (`:id/editar` apunta al mismo componente que `nuevo`) y la lista tiene su link "Editar".
 - [ ] Las rutas nuevas usan `loadComponent` (lazy), no importan el componente de forma directa/eager.
 - [ ] El enlace de navegación está en `core/nav-modulos.ts`, agrupado en el módulo de negocio correcto.

@@ -1,45 +1,48 @@
-<section class="empleado-form">
-  <h1>{{ editando ? 'Editar' : 'Nuevo' }} empleado</h1>
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} empleado</h1>
 
-  @if (cargandoRegistro()) {
-    <p>Cargando empleado…</p>
-  } @else {
-    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
-      <label>
-        Nombre
-        <input type="text" formControlName="nombre" />
-      </label>
+@if (cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando empleado…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 40rem">
+    <div class="col-md-6">
+      <label class="form-label" for="empleado-nombre">Nombre</label>
+      <input type="text" id="empleado-nombre" class="form-control" formControlName="nombre" />
+    </div>
 
-      <label>
-        Apellido
-        <input type="text" formControlName="apellido" />
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="empleado-apellido">Apellido</label>
+      <input type="text" id="empleado-apellido" class="form-control" formControlName="apellido" />
+    </div>
 
-      <label>
-        DNI
-        <input type="text" formControlName="dni" maxlength="8" />
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="empleado-dni">DNI</label>
+      <input type="text" id="empleado-dni" class="form-control" formControlName="dni" maxlength="8" />
+    </div>
 
-      <label>
-        Edad
-        <input type="number" formControlName="edad" />
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="empleado-edad">Edad</label>
+      <input type="number" id="empleado-edad" class="form-control" formControlName="edad" />
+    </div>
 
-      <label>
-        Especialidad
-        <input type="text" formControlName="especialidad" />
-      </label>
+    <div class="col-12">
+      <label class="form-label" for="empleado-especialidad">Especialidad</label>
+      <input type="text" id="empleado-especialidad" class="form-control" formControlName="especialidad" />
+    </div>
 
-      @if (error()) {
-        <p class="mensaje-error">{{ error() }}</p>
-      }
-
-      <div class="formulario__acciones">
-        <a routerLink="/empleados" class="boton">Cancelar</a>
-        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
-          {{ guardando() ? 'Guardando…' : 'Guardar' }}
-        </button>
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
       </div>
-    </form>
-  }
-</section>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/empleados" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}

@@ -16,4 +16,7 @@ export interface Requerimiento {
   estado: string;
 }
 
-export const ESTADOS_REQUERIMIENTO = ['pendiente', 'aprobado', 'rechazado'] as const;
+export const ESTADOS_REQUERIMIENTO = ['pendiente', 'aprobado', 'rechazado', 'atendido'] as const;
+
+/** Estado que fija el botón de acción rápida "Atendido" en el listado (ver RequerimientoService.marcarComoAtendido). */
+export const ESTADO_ATENDIDO = 'atendido';

@@ -1,79 +1,92 @@
-<section class="ticket-form">
-  <h1>{{ editando ? 'Editar' : 'Nuevo' }} ticket de pesaje</h1>
+<h1 class="h3 mb-3">{{ editando ? 'Editar' : 'Nuevo' }} ticket de pesaje</h1>
 
-  @if (cargandoOpciones() || cargandoRegistro()) {
-    <p>Cargando datos del formulario…</p>
-  } @else {
-    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
-      <label>
-        Conductor
-        <select formControlName="conductor">
-          <option value="" disabled>Selecciona un conductor…</option>
-          @for (opcion of conductores(); track opcion.id) {
-            <option [value]="opcion.id">{{ opcion.label }}</option>
-          }
-        </select>
-      </label>
+@if (cargandoOpciones() || cargandoRegistro()) {
+  <div class="d-flex align-items-center gap-2 text-body-secondary">
+    <div class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></div>
+    <span>Cargando datos del formulario…</span>
+  </div>
+} @else {
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="row g-3" style="max-width: 48rem">
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-conductor">Conductor</label>
+      <select id="ticket-conductor" class="form-select" formControlName="conductor">
+        <option value="" disabled>Selecciona un conductor…</option>
+        @for (opcion of conductores(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
 
-      <label>
-        Vehículo
-        <select formControlName="vehiculo">
-          <option value="" disabled>Selecciona un vehículo…</option>
-          @for (opcion of vehiculos(); track opcion.id) {
-            <option [value]="opcion.id">{{ opcion.label }}</option>
-          }
-        </select>
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-vehiculo">Vehículo</label>
+      <select id="ticket-vehiculo" class="form-select" formControlName="vehiculo">
+        <option value="" disabled>Selecciona un vehículo…</option>
+        @for (opcion of vehiculos(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
 
-      <label>
-        Encargado
-        <select formControlName="encargado">
-          <option value="" disabled>Selecciona un encargado…</option>
-          @for (opcion of encargados(); track opcion.id) {
-            <option [value]="opcion.id">{{ opcion.label }}</option>
-          }
-        </select>
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-encargado">Encargado</label>
+      <select id="ticket-encargado" class="form-select" formControlName="encargado">
+        <option value="" disabled>Selecciona un encargado…</option>
+        @for (opcion of encargados(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
 
-      <label>
-        Material
-        <select formControlName="material">
-          <option value="" disabled>Selecciona un material…</option>
-          @for (opcion of materiales(); track opcion.id) {
-            <option [value]="opcion.id">{{ opcion.label }}</option>
-          }
-        </select>
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-material">Material</label>
+      <select id="ticket-material" class="form-select" formControlName="material">
+        <option value="" disabled>Selecciona un material…</option>
+        @for (opcion of materiales(); track opcion.id) {
+          <option [value]="opcion.id">{{ opcion.label }}</option>
+        }
+      </select>
+    </div>
 
-      <label>
-        Peso bruto (kg, leído en báscula)
-        <input type="text" inputmode="decimal" formControlName="pesoBruto" placeholder="0.00" />
-      </label>
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-pesoBruto">Peso bruto (kg, leído en báscula)</label>
+      <input
+        type="text"
+        id="ticket-pesoBruto"
+        class="form-control"
+        inputmode="decimal"
+        formControlName="pesoBruto"
+        placeholder="0.00"
+      />
+      <div class="form-text">Equivale a {{ pesoBrutoToneladas() }} t.</div>
+    </div>
 
-      <p class="mensaje-ayuda">
+    <div class="col-md-6 d-flex align-items-end">
+      <div class="form-text mb-2">
         El peso neto lo calcula el servidor (peso bruto − tara del vehículo); se ve recién después de guardar.
-      </p>
-
-      <label>
-        Descripción (opcional)
-        <input type="text" formControlName="descripcion" />
-      </label>
-
-      <label>
-        Observaciones (opcional)
-        <input type="text" formControlName="observaciones" />
-      </label>
-
-      @if (error()) {
-        <p class="mensaje-error">{{ error() }}</p>
-      }
-
-      <div class="formulario__acciones">
-        <a routerLink="/tickets" class="boton">Cancelar</a>
-        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
-          {{ guardando() ? 'Guardando…' : 'Guardar' }}
-        </button>
       </div>
-    </form>
-  }
-</section>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-descripcion">Descripción (opcional)</label>
+      <input type="text" id="ticket-descripcion" class="form-control" formControlName="descripcion" />
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="ticket-observaciones">Observaciones (opcional)</label>
+      <input type="text" id="ticket-observaciones" class="form-control" formControlName="observaciones" />
+    </div>
+
+    @if (error()) {
+      <div class="col-12">
+        <div class="alert alert-danger mb-0" role="alert">{{ error() }}</div>
+      </div>
+    }
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+      <a routerLink="/tickets" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+}
