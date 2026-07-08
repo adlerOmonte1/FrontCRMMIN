@@ -5,16 +5,6 @@ import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 import { PaginatedResponse } from '@models/pagination';
 
-/**
- * Cliente REST genérico para consumir la API de GestionMinera.
- *
- * Único punto del frontend que conoce la URL base y la forma de las
- * respuestas del backend (paginación de DRF, convención de rutas con "/").
- * No sabe nada de "empleados", "vehiculos", etc.: cada servicio de entidad
- * (ver EmpleadoService) lo usa por composición pasándole su propio
- * `resource`. Esto es lo que permite agregar las 14 entidades restantes sin
- * modificar esta clase (abierta a extensión, cerrada a modificación).
- */
 @Injectable({
   providedIn: 'root',
 })
