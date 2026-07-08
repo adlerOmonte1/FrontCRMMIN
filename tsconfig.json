@@ -3,6 +3,14 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/app/core/*"],
+      "@models/*": ["src/app/models/*"],
+      "@services/*": ["src/app/services/*"],
+      "@pages/*": ["src/app/pages/*"],
+      "@environments/*": ["src/environments/*"]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

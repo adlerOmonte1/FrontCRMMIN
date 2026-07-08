@@ -1,59 +1,126 @@
-# ErpMinero
+# ERP Minero — Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+Cliente web construido con **Angular** para la API REST **Gestión Minera** (repositorio backend separado, `GestionMinera`, Django + Django REST Framework). Esta aplicación es la que usan los encargados de área para registrar personal, flota, tickets de pesaje, inventario, mantenimiento, reportes y requerimientos internos, sin acceso directo a la base de datos.
 
-## Development server
+> Backend y frontend son **dos repositorios independientes**. Este repo no contiene ni necesita el código del backend, solo su URL base (ver [Variables de entorno](#variables-de-entorno)).
 
-To start a local development server, run:
-
-```bash
-ng serve
+```mermaid
+flowchart LR
+    U["Encargado (navegador)"] --> APP["Angular App<br/>(este repo)"]
+    APP -- "HTTP + header X-Api-Key" --> API["API REST<br/>Django + DRF<br/>(repo GestionMinera)"]
+    API --> DB[("MySQL: CRMMIN")]
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Índice
 
-## Code scaffolding
+- [Documentación completa](#documentación-completa)
+- [Stack tecnológico](#stack-tecnológico)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Variables de entorno](#variables-de-entorno)
+- [Convenciones de nombres](#convenciones-de-nombres)
+- [Estado actual del proyecto](#estado-actual-del-proyecto)
+- [Scripts disponibles](#scripts-disponibles)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Documentación completa
 
-```bash
-ng generate component component-name
+| # | Documento | Contenido |
+|---|---|---|
+| 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales) |
+| 2 | [Flujo del código](docs/02-flujo-codigo-frontend.md) | Recorrido línea por línea de una acción real (crear y listar empleados): componente → servicio → interceptor → HTTP → backend |
+| 3 | [Guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso para replicar el patrón de `empleados` en las 14 entidades restantes del backend, con tabla de referencia completa |
+
+Estos documentos asumen que ya leíste (o tenés a mano) la documentación del backend `GestionMinera` — en particular su diccionario de datos y su documento de arquitectura técnica — ya que el frontend refleja esos contratos de datos, no los redefine.
+
+## Stack tecnológico
+
+| Componente | Tecnología | Versión |
+|---|---|---|
+| Framework | Angular (standalone, sin NgModules) | 21 |
+| Lenguaje | TypeScript | 5.9 |
+| Reactividad / estado local | Signals (`signal()`) | — |
+| Formularios | Reactive Forms (`ReactiveFormsModule`) | — |
+| HTTP | `HttpClient` + interceptores funcionales | — |
+| Testing | Vitest (`@angular/build:unit-test`) | 4 |
+| Build | `@angular/build` (esbuild) | 21 |
+
+## Estructura del repositorio
+
+```
+erp-minero/
+├── src/
+│   ├── app/
+│   │   ├── core/                 # Infraestructura transversal (un único cliente HTTP, interceptores)
+│   │   │   ├── services/api.ts
+│   │   │   └── interceptors/api-key-interceptor.ts
+│   │   ├── models/                # Contratos de datos (uno por entidad + paginación genérica)
+│   │   ├── services/               # Un servicio de acceso a datos por entidad (EmpleadoService, ...)
+│   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio
+│   │   │   └── empleados/
+│   │   ├── app.config.ts           # Providers globales (router, HttpClient, interceptores)
+│   │   ├── app.routes.ts           # Rutas de la aplicación
+│   │   └── app.ts                  # Shell raíz (header + <router-outlet>)
+│   ├── environments/                # environment.ts (dev) / environment.prod.ts
+│   └── styles.css                   # Estilos globales mínimos compartidos (botones, tabla, mensajes)
+├── docs/                             # Esta documentación
+└── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, ...)
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Ver el detalle de **por qué** está organizado así en [Arquitectura del frontend](docs/01-arquitectura-frontend.md).
+
+## Puesta en marcha
+
+Requisitos previos:
+
+- Node.js 20+ y npm.
+- El backend `GestionMinera` corriendo localmente (`python manage.py runserver`, por defecto en `http://127.0.0.1:8000`).
+- **Importante:** el backend trae configurado CORS para un frontend Vue (`http://localhost:5173`), no para el puerto por defecto de Angular (`http://localhost:4200`). Hasta que se actualice `CORS_ALLOWED_ORIGINS` en `requerimientos/settings.py` del backend para incluir `http://localhost:4200`, toda petición desde `ng serve` será bloqueada por el navegador (error de CORS en consola, no un error de la API). Ver la nota completa en [Arquitectura del frontend § CORS](docs/01-arquitectura-frontend.md#5-cors-un-desajuste-pendiente-con-el-backend).
 
 ```bash
-ng generate --help
+# 1. Instalar dependencias
+npm install
+
+# 2. Levantar el servidor de desarrollo (http://localhost:4200)
+npm start
+
+# 3. Ejecutar las pruebas unitarias
+npm test
+
+# 4. Build de producción
+npm run build
 ```
 
-## Building
+## Variables de entorno
 
-To build the project run:
+La URL base de la API y la API Key compartida viven en `src/environments/`, no hardcodeadas en cada servicio:
 
-```bash
-ng build
-```
+| Archivo | Uso | `apiUrl` |
+|---|---|---|
+| `environment.ts` | `ng serve` (desarrollo) | `http://127.0.0.1:8000/api` |
+| `environment.prod.ts` | `ng build` (producción, vía `fileReplacements` en `angular.json`) | placeholder a reemplazar en el pipeline de build |
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+La API Key de desarrollo (`crm-minera-2024`) es la misma que ya está en texto plano en el repositorio del backend (`settings.py`), así que commitearla en `environment.ts` no expone nada nuevo. La de producción **no** debe commitearse: `environment.prod.ts` trae un placeholder que se sobrescribe en el servidor de build.
 
-## Running unit tests
+## Convenciones de nombres
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Este proyecto sigue el esquema de generación por defecto del Angular CLI 21 (sin sufijos de tipo en el nombre de archivo ni en la clase, p. ej. `api.ts` → `class Api`, no `api.service.ts` → `class ApiService`), con **una excepción deliberada**: los servicios de acceso a datos de cada entidad sí llevan el sufijo `.service.ts` / `Service` (p. ej. `empleado.service.ts` → `EmpleadoService`), porque el modelo ya ocupa el nombre "pelado" de la entidad (`models/empleado.ts` → `interface Empleado`). Sin el sufijo, ambos símbolos colisionarían al importarlos juntos en un mismo componente. El detalle completo está en [Arquitectura del frontend § Convenciones de nomenclatura](docs/01-arquitectura-frontend.md#4-convenciones-de-nomenclatura).
 
-```bash
-ng test
-```
+## Estado actual del proyecto
 
-## Running end-to-end tests
+Esto es una demostración de configuración + un borrador, no una aplicación completa:
 
-For end-to-end (e2e) testing, run:
+- ✅ Configuración de entorno (environments, path aliases, interceptor de API Key, cliente HTTP genérico).
+- ✅ Módulo `empleados` como ejemplo end-to-end: listar, crear y eliminar, con manejo de error básico.
+- ⬜ Edición de empleados (`update`/`patch` ya existen en `EmpleadoService`, falta la pantalla).
+- ⬜ Los 14 recursos restantes del backend (conductores, vehículos, tickets, inventario, mantenimiento, reportes, requerimientos, etc.) — ver la [guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) para replicar el patrón.
+- ⬜ Manejo de errores global (hoy cada componente atrapa sus propios errores; no hay interceptor de errores ni página 404).
+- ⬜ Autenticación de usuario individual — hoy, igual que el backend, toda la app comparte una única API Key (no hay login ni roles en el cliente).
 
-```bash
-ng e2e
-```
+## Scripts disponibles
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Comando | Qué hace |
+|---|---|
+| `npm start` | `ng serve` — servidor de desarrollo en `http://localhost:4200` |
+| `npm run build` | `ng build` — build de producción en `dist/erp-minero` |
+| `npm run watch` | `ng build --watch --configuration development` |
+| `npm test` | `ng test` — pruebas unitarias con Vitest |
