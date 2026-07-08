@@ -1,0 +1,44 @@
+<section class="detalles-inventario">
+  <header class="listado__header">
+    <h1>Detalles de inventario</h1>
+    <a routerLink="/detalles-inventario/nuevo" class="boton boton--primario">+ Nuevo detalle</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando detalles…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (detalles().length === 0) {
+    <p>No hay detalles de inventario registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Inventario</th>
+          <th>Ítem</th>
+          <th>Cantidad</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (detalle of detalles(); track detalle.id) {
+          <tr>
+            <td>{{ detalle.etiquetaInventario }}</td>
+            <td>{{ detalle.etiquetaItem }}</td>
+            <td>{{ detalle.cantidad }}</td>
+            <td>{{ detalle.ubicacion }}</td>
+            <td>{{ detalle.estado }}</td>
+            <td>
+              <a [routerLink]="['/detalles-inventario', detalle.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(detalle)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

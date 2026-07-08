@@ -1,0 +1,45 @@
+<section class="gasto-viaje-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} gasto de viaje</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Ticket
+        <select formControlName="ticket">
+          <option value="" disabled>Selecciona un ticket…</option>
+          @for (opcion of tickets(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Descripción (opcional)
+        <input type="text" formControlName="descripcion" />
+      </label>
+
+      <label>
+        Consumo (galones)
+        <input type="text" inputmode="decimal" formControlName="consumo" placeholder="0.00" />
+      </label>
+
+      <label>
+        Monto
+        <input type="text" inputmode="decimal" formControlName="monto" placeholder="0.00" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/gastos-viaje" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,0 +1,39 @@
+<section class="material-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} material</h1>
+
+  @if (cargandoRegistro()) {
+    <p>Cargando material…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        Lugar
+        <input type="text" formControlName="lugar" />
+      </label>
+
+      <label>
+        Tipo
+        <select formControlName="tipo">
+          @for (opcion of tipos; track opcion.valor) {
+            <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+          }
+        </select>
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/materiales" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

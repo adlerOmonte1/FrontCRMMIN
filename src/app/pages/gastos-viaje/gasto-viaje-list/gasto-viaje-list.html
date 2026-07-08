@@ -1,0 +1,44 @@
+<section class="gastos-viaje">
+  <header class="listado__header">
+    <h1>Gastos de viaje</h1>
+    <a routerLink="/gastos-viaje/nuevo" class="boton boton--primario">+ Nuevo gasto</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando gastos de viaje…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (gastos().length === 0) {
+    <p>No hay gastos de viaje registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Ticket</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Consumo (gal)</th>
+          <th>Monto</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (gasto of gastos(); track gasto.id) {
+          <tr>
+            <td>{{ gasto.etiquetaTicket }}</td>
+            <td>{{ gasto.fecha | date: 'short' }}</td>
+            <td>{{ gasto.descripcion || '—' }}</td>
+            <td>{{ gasto.consumo }}</td>
+            <td>{{ gasto.monto }}</td>
+            <td>
+              <a [routerLink]="['/gastos-viaje', gasto.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(gasto)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

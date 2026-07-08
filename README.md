@@ -19,6 +19,7 @@ flowchart LR
 - [Puesta en marcha](#puesta-en-marcha)
 - [Variables de entorno](#variables-de-entorno)
 - [Convenciones de nombres](#convenciones-de-nombres)
+- [Módulos implementados](#módulos-implementados)
 - [Estado actual del proyecto](#estado-actual-del-proyecto)
 - [Scripts disponibles](#scripts-disponibles)
 
@@ -26,9 +27,9 @@ flowchart LR
 
 | # | Documento | Contenido |
 |---|---|---|
-| 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales) |
+| 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales, selects con FK) |
 | 2 | [Flujo del código](docs/02-flujo-codigo-frontend.md) | Recorrido línea por línea de una acción real (crear y listar empleados): componente → servicio → interceptor → HTTP → backend |
-| 3 | [Guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso para replicar el patrón de `empleados` en las 14 entidades restantes del backend, con tabla de referencia completa |
+| 3 | [Guía del patrón de módulo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso del patrón que siguen los 15 módulos (útil para modificar uno existente o si el backend agrega una entidad nueva), con tabla de referencia completa |
 
 Estos documentos asumen que ya leíste (o tenés a mano) la documentación del backend `GestionMinera` — en particular su diccionario de datos y su documento de arquitectura técnica — ya que el frontend refleja esos contratos de datos, no los redefine.
 
@@ -50,18 +51,18 @@ Estos documentos asumen que ya leíste (o tenés a mano) la documentación del b
 erp-minero/
 ├── src/
 │   ├── app/
-│   │   ├── core/                 # Infraestructura transversal (un único cliente HTTP, interceptores)
+│   │   ├── core/                 # Infraestructura transversal (cliente HTTP genérico, interceptor de auth, config de navegación)
 │   │   │   ├── services/api.ts
-│   │   │   └── interceptors/api-key-interceptor.ts
-│   │   ├── models/                # Contratos de datos (uno por entidad + paginación genérica)
-│   │   ├── services/               # Un servicio de acceso a datos por entidad (EmpleadoService, ...)
-│   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio
-│   │   │   └── empleados/
+│   │   │   ├── interceptors/api-key-interceptor.ts
+│   │   │   └── nav-modulos.ts
+│   │   ├── models/                # Contratos de datos: uno por entidad + PaginatedResponse<T> + OpcionSelect
+│   │   ├── services/               # Un servicio de acceso a datos por entidad (15 en total)
+│   │   ├── pages/                  # Componentes ruteados, agrupados por módulo de negocio (15 carpetas)
 │   │   ├── app.config.ts           # Providers globales (router, HttpClient, interceptores)
-│   │   ├── app.routes.ts           # Rutas de la aplicación
-│   │   └── app.ts                  # Shell raíz (header + <router-outlet>)
+│   │   ├── app.routes.ts           # Rutas de la aplicación (list/nuevo/:id/editar por entidad)
+│   │   └── app.ts                  # Shell raíz (nav lateral agrupada + <router-outlet>)
 │   ├── environments/                # environment.ts (dev) / environment.prod.ts
-│   └── styles.css                   # Estilos globales mínimos compartidos (botones, tabla, mensajes)
+│   └── styles.css                   # Estilos globales compartidos (botones, tabla, layout de formularios)
 ├── docs/                             # Esta documentación
 └── angular.json / tsconfig.json      # Configuración de build y path aliases (@core, @models, ...)
 ```
@@ -105,16 +106,30 @@ La API Key de desarrollo (`crm-minera-2024`) es la misma que ya está en texto p
 
 Este proyecto sigue el esquema de generación por defecto del Angular CLI 21 (sin sufijos de tipo en el nombre de archivo ni en la clase, p. ej. `api.ts` → `class Api`, no `api.service.ts` → `class ApiService`), con **una excepción deliberada**: los servicios de acceso a datos de cada entidad sí llevan el sufijo `.service.ts` / `Service` (p. ej. `empleado.service.ts` → `EmpleadoService`), porque el modelo ya ocupa el nombre "pelado" de la entidad (`models/empleado.ts` → `interface Empleado`). Sin el sufijo, ambos símbolos colisionarían al importarlos juntos en un mismo componente. El detalle completo está en [Arquitectura del frontend § Convenciones de nomenclatura](docs/01-arquitectura-frontend.md#4-convenciones-de-nomenclatura).
 
+## Módulos implementados
+
+Los 15 recursos del backend tienen su módulo completo (modelo + servicio + listar + crear + editar + eliminar), agrupados en la navegación igual que en la documentación del backend:
+
+| Módulo de negocio | Entidades |
+|---|---|
+| Personal y flota | Empleados, Conductores, Encargados, Vehículos |
+| Pesaje y transporte | Materiales, Tickets, Gastos de viaje |
+| Inventario | Inventarios, Detalles de inventario, Máquinas, Insumos |
+| Mantenimiento | Mantenimientos |
+| Reportes | Reportes |
+| Requerimientos | Requerimientos, Ítems solicitados (detalle) |
+
+Cada uno sigue exactamente el mismo patrón (documentado en [docs/03](docs/03-guia-nuevo-modulo.md)): `EmpleadoService` es el ejemplo de referencia más simple, `TicketForm` el más elaborado (4 selects con FK), y `DetalleInventarioForm`/`MantenimientoForm` son los que refuerzan en el cliente una regla de "uno u otro" que el backend no valida (máquina/insumo, máquina/volquete).
+
 ## Estado actual del proyecto
 
-Esto es una demostración de configuración + un borrador, no una aplicación completa:
-
-- ✅ Configuración de entorno (environments, path aliases, interceptor de API Key, cliente HTTP genérico).
-- ✅ Módulo `empleados` como ejemplo end-to-end: listar, crear y eliminar, con manejo de error básico.
-- ⬜ Edición de empleados (`update`/`patch` ya existen en `EmpleadoService`, falta la pantalla).
-- ⬜ Los 14 recursos restantes del backend (conductores, vehículos, tickets, inventario, mantenimiento, reportes, requerimientos, etc.) — ver la [guía para agregar un módulo nuevo](docs/03-guia-nuevo-modulo.md) para replicar el patrón.
+- ✅ Los 15 módulos con CRUD completo: listar (paginado), crear, **editar**, eliminar.
+- ✅ Selects de relaciones (FK) resueltos a etiquetas legibles uniendo datos del lado del cliente (`listConLabel()` en cada servicio) — el backend no serializa anidado.
+- ✅ Reglas de negocio no validadas por el backend, reforzadas en el cliente: "máquina o insumo" (`DetalleInventarioForm`), "máquina o volquete" (`MantenimientoForm`).
+- ✅ Flujo cabecera-detalle asistido: al crear un `Requerimiento`, el formulario de su primer ítem llega con la cabecera preseleccionada.
 - ⬜ Manejo de errores global (hoy cada componente atrapa sus propios errores; no hay interceptor de errores ni página 404).
 - ⬜ Autenticación de usuario individual — hoy, igual que el backend, toda la app comparte una única API Key (no hay login ni roles en el cliente).
+- ⬜ Filtrado/búsqueda en las listas — el backend no lo soporta por query params (ver limitación documentada en el backend), así que cualquier filtro tendría que implementarse sobre los datos ya traídos al cliente.
 
 ## Scripts disponibles
 

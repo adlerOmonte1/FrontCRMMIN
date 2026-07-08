@@ -1,0 +1,40 @@
+<section class="insumos">
+  <header class="listado__header">
+    <h1>Insumos</h1>
+    <a routerLink="/insumos/nuevo" class="boton boton--primario">+ Nuevo insumo</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando insumos…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (insumos().length === 0) {
+    <p>No hay insumos registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Medida</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (insumo of insumos(); track insumo.id) {
+          <tr>
+            <td>{{ insumo.nombre }}</td>
+            <td>{{ insumo.categoria }}</td>
+            <td>{{ insumo.medida || '—' }}</td>
+            <td>
+              <a [routerLink]="['/insumos', insumo.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(insumo)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

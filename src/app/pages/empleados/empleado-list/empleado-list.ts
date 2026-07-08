@@ -8,7 +8,6 @@ import { EmpleadoService } from '@services/empleado.service';
   selector: 'app-empleado-list',
   imports: [RouterLink],
   templateUrl: './empleado-list.html',
-  styleUrl: './empleado-list.css',
 })
 export class EmpleadoList {
   private readonly empleadoService = inject(EmpleadoService);

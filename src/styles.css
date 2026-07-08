@@ -63,3 +63,40 @@ body {
 .mensaje-error {
   color: #dc2626;
 }
+
+.mensaje-ayuda {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+/* Layout compartido por toda pantalla de listado (list.html de cada módulo):
+   título a la izquierda, acción "+ Nuevo" a la derecha. */
+.listado__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+/* Layout compartido por todo formulario de alta/edición (form.html de cada
+   módulo): columna angosta de labels, con las acciones (Cancelar/Guardar)
+   al final. */
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 26rem;
+}
+
+.formulario label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.formulario__acciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

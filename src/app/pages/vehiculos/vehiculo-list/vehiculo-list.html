@@ -1,1 +1,44 @@
-<p>vehiculo-list works!</p>
+<section class="vehiculos">
+  <header class="listado__header">
+    <h1>Vehículos</h1>
+    <a routerLink="/vehiculos/nuevo" class="boton boton--primario">+ Nuevo vehículo</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando vehículos…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (vehiculos().length === 0) {
+    <p>No hay vehículos registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Placa</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+          <th>Color</th>
+          <th>Tara</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (vehiculo of vehiculos(); track vehiculo.id) {
+          <tr>
+            <td>{{ vehiculo.placa }}</td>
+            <td>{{ vehiculo.marca }}</td>
+            <td>{{ vehiculo.modelo }}</td>
+            <td>{{ vehiculo.color }}</td>
+            <td>{{ vehiculo.tara }}</td>
+            <td>
+              <a [routerLink]="['/vehiculos', vehiculo.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(vehiculo)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

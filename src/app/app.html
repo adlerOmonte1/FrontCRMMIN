@@ -1,7 +1,22 @@
-<header class="app-header">
-  <h1>{{ title }}</h1>
-</header>
+<div class="app-layout">
+  <nav class="app-nav">
+    <h1 class="app-nav__titulo">{{ title }}</h1>
 
-<main class="app-main">
-  <router-outlet />
-</main>
+    @for (grupo of grupos; track grupo.titulo) {
+      <div class="app-nav__grupo">
+        <h2>{{ grupo.titulo }}</h2>
+        <ul>
+          @for (enlace of grupo.enlaces; track enlace.ruta) {
+            <li>
+              <a [routerLink]="enlace.ruta" routerLinkActive="activo">{{ enlace.etiqueta }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+
+  <main class="app-main">
+    <router-outlet />
+  </main>
+</div>

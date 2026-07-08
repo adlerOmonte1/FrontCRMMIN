@@ -1,0 +1,43 @@
+<section class="requerimientos">
+  <header class="listado__header">
+    <h1>Requerimientos</h1>
+    <a routerLink="/requerimientos/nuevo" class="boton boton--primario">+ Nuevo requerimiento</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando requerimientos…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (requerimientos().length === 0) {
+    <p>No hay requerimientos registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Encargado</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (requerimiento of requerimientos(); track requerimiento.id) {
+          <tr>
+            <td>{{ requerimiento.id }}</td>
+            <td>{{ requerimiento.nombreEncargado }}</td>
+            <td>{{ requerimiento.estado }}</td>
+            <td>{{ requerimiento.fecha | date: 'short' }}</td>
+            <td>
+              <a routerLink="/detalles-requerimiento" class="boton">Ver ítems</a>
+              <a [routerLink]="['/requerimientos', requerimiento.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(requerimiento)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

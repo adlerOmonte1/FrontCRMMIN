@@ -1,0 +1,109 @@
+<section class="detalle-inventario-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} detalle de inventario</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Inventario
+        <select formControlName="inventario">
+          <option value="" disabled>Selecciona un inventario…</option>
+          @for (opcion of inventarios(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <fieldset>
+        <legend>¿Qué se está contando?</legend>
+        <label>
+          <input
+            type="radio"
+            name="tipoItem"
+            [checked]="tipoItem() === 'maquina'"
+            (change)="seleccionarTipo('maquina')"
+          />
+          Máquina
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="tipoItem"
+            [checked]="tipoItem() === 'insumo'"
+            (change)="seleccionarTipo('insumo')"
+          />
+          Insumo
+        </label>
+      </fieldset>
+
+      @if (tipoItem() === 'maquina') {
+        <label>
+          Máquina
+          <select formControlName="maquina">
+            <option value="" disabled>Selecciona una máquina…</option>
+            @for (opcion of maquinas(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+        </label>
+      } @else {
+        <label>
+          Insumo
+          <select formControlName="insumo">
+            <option value="" disabled>Selecciona un insumo…</option>
+            @for (opcion of insumos(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <label>
+        Cantidad
+        <input type="text" formControlName="cantidad" />
+      </label>
+
+      <label>
+        Fecha de adquisición
+        <input type="datetime-local" formControlName="fecha_adquision" />
+      </label>
+
+      <label>
+        Fecha de fin (opcional)
+        <input type="datetime-local" formControlName="fecha_fin" />
+      </label>
+
+      <label>
+        Ubicación
+        <input type="text" formControlName="ubicacion" />
+      </label>
+
+      <label>
+        Descripción
+        <input type="text" formControlName="descripcion" />
+      </label>
+
+      <label>
+        Observación
+        <input type="text" formControlName="observacion" />
+      </label>
+
+      <label>
+        Estado
+        <input type="text" formControlName="estado" placeholder="p. ej. operativo, de baja…" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/detalles-inventario" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -1,0 +1,40 @@
+<section class="reportes">
+  <header class="listado__header">
+    <h1>Reportes</h1>
+    <a routerLink="/reportes/nuevo" class="boton boton--primario">+ Nuevo reporte</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando reportes…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (reportes().length === 0) {
+    <p>No hay reportes registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Encargado</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (reporte of reportes(); track reporte.id) {
+          <tr>
+            <td>{{ reporte.nombreEncargado }}</td>
+            <td>{{ reporte.fecha | date: 'short' }}</td>
+            <td>{{ reporte.descripcion }}</td>
+            <td>
+              <a [routerLink]="['/reportes', reporte.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(reporte)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

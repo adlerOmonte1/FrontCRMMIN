@@ -1,0 +1,49 @@
+<section class="requerimiento-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} requerimiento</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Encargado
+        <select formControlName="encargado">
+          <option value="" disabled>Selecciona un encargado…</option>
+          @for (opcion of encargados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Estado
+        <select formControlName="estado">
+          @for (estado of estados; track estado) {
+            <option [value]="estado">{{ estado }}</option>
+          }
+        </select>
+      </label>
+
+      @if (!editando) {
+        <p class="mensaje-ayuda">
+          Después de guardar, vas a poder agregar los ítems solicitados (insumos o herramientas).
+        </p>
+      } @else {
+        <p class="mensaje-ayuda">
+          La fecha se actualiza al momento de guardar (el backend usa "auto_now").
+        </p>
+      }
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/requerimientos" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : editando ? 'Guardar' : 'Guardar y agregar ítems' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

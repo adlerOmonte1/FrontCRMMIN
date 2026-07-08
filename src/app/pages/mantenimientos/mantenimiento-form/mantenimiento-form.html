@@ -1,0 +1,89 @@
+<section class="mantenimiento-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} mantenimiento</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Encargado
+        <select formControlName="encargado">
+          <option value="" disabled>Selecciona un encargado…</option>
+          @for (opcion of encargados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <fieldset>
+        <legend>¿A qué se le da mantenimiento?</legend>
+        <label>
+          <input
+            type="radio"
+            name="tipoObjetivo"
+            [checked]="tipoObjetivo() === 'maquina'"
+            (change)="seleccionarTipo('maquina')"
+          />
+          Máquina
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="tipoObjetivo"
+            [checked]="tipoObjetivo() === 'volquete'"
+            (change)="seleccionarTipo('volquete')"
+          />
+          Vehículo (volquete)
+        </label>
+      </fieldset>
+
+      @if (tipoObjetivo() === 'maquina') {
+        <label>
+          Máquina
+          <select formControlName="maquina">
+            <option value="" disabled>Selecciona una máquina…</option>
+            @for (opcion of maquinas(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+        </label>
+      } @else {
+        <label>
+          Vehículo
+          <select formControlName="volquete">
+            <option value="" disabled>Selecciona un vehículo…</option>
+            @for (opcion of vehiculos(); track opcion.id) {
+              <option [value]="opcion.id">{{ opcion.label }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <label>
+        Fecha
+        <input type="date" formControlName="fecha" />
+      </label>
+
+      <label>
+        Descripción (opcional — por defecto "Sin descripción")
+        <input type="text" formControlName="descripcion" />
+      </label>
+
+      <label>
+        Costo (opcional)
+        <input type="text" inputmode="decimal" formControlName="costo" placeholder="0.00" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/mantenimientos" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

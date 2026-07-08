@@ -1,6 +1,6 @@
 # Flujo del Código — De un Clic a la Base de Datos
 
-> Ver también: [Arquitectura del frontend](01-arquitectura-frontend.md) · [Guía para agregar un módulo nuevo](03-guia-nuevo-modulo.md)
+> Ver también: [Arquitectura del frontend](01-arquitectura-frontend.md) · [Guía del patrón de módulo](03-guia-nuevo-modulo.md)
 
 Este documento recorre, archivo por archivo, qué pasa realmente cuando alguien usa la pantalla de empleados. Es el equivalente, del lado del frontend, al documento `04-flujo-codigo.md` del repositorio backend (`GestionMinera/docs/`) — léanse en conjunto para tener la petición completa, de un extremo al otro. Al ser dos repositorios separados, no se enlazan entre sí como archivos relativos; buscá ese documento dentro del repo del backend.
 

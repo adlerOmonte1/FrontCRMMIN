@@ -1,0 +1,45 @@
+<section class="inventarios">
+  <header class="listado__header">
+    <h1>Inventarios</h1>
+    <a routerLink="/inventarios/nuevo" class="boton boton--primario">+ Nuevo inventario</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando inventarios…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (inventarios().length === 0) {
+    <p>No hay inventarios registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Lugar</th>
+          <th>Descripción</th>
+          <th>Encargado</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (inventario of inventarios(); track inventario.id) {
+          <tr>
+            <td>{{ inventario.id }}</td>
+            <td>{{ inventario.lugar }}</td>
+            <td>{{ inventario.descripcion }}</td>
+            <td>{{ inventario.nombreEncargado }}</td>
+            <td>{{ inventario.fechaInventario | date: 'short' }}</td>
+            <td>
+              <a routerLink="/detalles-inventario" class="boton">Ver detalles</a>
+              <a [routerLink]="['/inventarios', inventario.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(inventario)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

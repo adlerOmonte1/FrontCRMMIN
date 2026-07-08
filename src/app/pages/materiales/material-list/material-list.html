@@ -1,0 +1,40 @@
+<section class="materiales">
+  <header class="listado__header">
+    <h1>Materiales</h1>
+    <a routerLink="/materiales/nuevo" class="boton boton--primario">+ Nuevo material</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando materiales…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (materiales().length === 0) {
+    <p>No hay materiales registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Lugar</th>
+          <th>Tipo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (material of materiales(); track material.id) {
+          <tr>
+            <td>{{ material.nombre }}</td>
+            <td>{{ material.lugar }}</td>
+            <td>{{ material.tipo }}</td>
+            <td>
+              <a [routerLink]="['/materiales', material.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(material)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

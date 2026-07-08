@@ -1,0 +1,42 @@
+<section class="reporte-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} reporte</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Encargado
+        <select formControlName="encargado">
+          <option value="" disabled>Selecciona un encargado…</option>
+          @for (opcion of encargados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Descripción
+        <textarea formControlName="descripcion" rows="4"></textarea>
+      </label>
+
+      @if (editando) {
+        <p class="mensaje-ayuda">
+          La fecha del reporte se actualiza al momento de guardar (el backend usa "auto_now"): al editar se pierde
+          la fecha original de creación.
+        </p>
+      }
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/reportes" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

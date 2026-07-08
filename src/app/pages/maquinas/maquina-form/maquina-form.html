@@ -1,0 +1,35 @@
+<section class="maquina-form">
+  <h1>{{ editando ? 'Editar' : 'Nueva' }} máquina</h1>
+
+  @if (cargandoRegistro()) {
+    <p>Cargando máquina…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        Marca
+        <input type="text" formControlName="marca" />
+      </label>
+
+      <label>
+        N° de serie
+        <input type="text" formControlName="nro_serie" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/maquinas" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

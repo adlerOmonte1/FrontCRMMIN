@@ -1,1 +1,45 @@
-<p>vehiculo-form works!</p>
+<section class="vehiculo-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} vehículo</h1>
+
+  @if (cargandoRegistro()) {
+    <p>Cargando vehículo…</p>
+  } @else {
+  <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+    <label>
+      Placa
+      <input type="text" formControlName="placa" maxlength="10" />
+    </label>
+
+    <label>
+      Marca
+      <input type="text" formControlName="marca" maxlength="8" />
+    </label>
+
+    <label>
+      Modelo
+      <input type="text" formControlName="modelo" />
+    </label>
+
+    <label>
+      Color
+      <input type="text" formControlName="color" />
+    </label>
+
+    <label>
+      Tara (peso vacío, kg)
+      <input type="text" inputmode="decimal" formControlName="tara" placeholder="0.00" />
+    </label>
+
+    @if (error()) {
+      <p class="mensaje-error">{{ error() }}</p>
+    }
+
+    <div class="formulario__acciones">
+      <a routerLink="/vehiculos" class="boton">Cancelar</a>
+      <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+  }
+</section>

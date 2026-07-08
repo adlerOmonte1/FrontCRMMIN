@@ -1,0 +1,40 @@
+<section class="conductor-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} conductor</h1>
+
+  @if (cargandoRegistro()) {
+    <p>Cargando conductor…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Empleado
+        <select formControlName="empleado">
+          <option value="" disabled>Selecciona un empleado…</option>
+          @for (opcion of empleados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Licencia
+        <input type="text" formControlName="licencia" maxlength="9" />
+      </label>
+
+      <label>
+        Tipo de licencia
+        <input type="text" formControlName="tipoLic" placeholder="p. ej. A-IIIc" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/conductores" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

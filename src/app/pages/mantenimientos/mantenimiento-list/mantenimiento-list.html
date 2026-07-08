@@ -1,0 +1,44 @@
+<section class="mantenimientos">
+  <header class="listado__header">
+    <h1>Mantenimientos</h1>
+    <a routerLink="/mantenimientos/nuevo" class="boton boton--primario">+ Nuevo mantenimiento</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando mantenimientos…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (mantenimientos().length === 0) {
+    <p>No hay mantenimientos registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Objetivo</th>
+          <th>Encargado</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Costo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (mantenimiento of mantenimientos(); track mantenimiento.id) {
+          <tr>
+            <td>{{ mantenimiento.etiquetaObjetivo }}</td>
+            <td>{{ mantenimiento.nombreEncargado }}</td>
+            <td>{{ mantenimiento.fecha }}</td>
+            <td>{{ mantenimiento.descripcion }}</td>
+            <td>{{ mantenimiento.costo || '—' }}</td>
+            <td>
+              <a [routerLink]="['/mantenimientos', mantenimiento.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(mantenimiento)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

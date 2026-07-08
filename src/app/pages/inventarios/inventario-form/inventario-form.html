@@ -1,0 +1,46 @@
+<section class="inventario-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} inventario</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Encargado
+        <select formControlName="encargado">
+          <option value="" disabled>Selecciona un encargado…</option>
+          @for (opcion of encargados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Lugar
+        <input type="text" formControlName="lugar" />
+      </label>
+
+      <label>
+        Descripción
+        <input type="text" formControlName="descripcion" />
+      </label>
+
+      @if (!editando) {
+        <p class="mensaje-ayuda">
+          Después de guardar, agregá cada máquina o insumo contado desde "Detalles de inventario".
+        </p>
+      }
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/inventarios" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

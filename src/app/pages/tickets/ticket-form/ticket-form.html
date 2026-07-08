@@ -1,0 +1,79 @@
+<section class="ticket-form">
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} ticket de pesaje</h1>
+
+  @if (cargandoOpciones() || cargandoRegistro()) {
+    <p>Cargando datos del formulario…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Conductor
+        <select formControlName="conductor">
+          <option value="" disabled>Selecciona un conductor…</option>
+          @for (opcion of conductores(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Vehículo
+        <select formControlName="vehiculo">
+          <option value="" disabled>Selecciona un vehículo…</option>
+          @for (opcion of vehiculos(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Encargado
+        <select formControlName="encargado">
+          <option value="" disabled>Selecciona un encargado…</option>
+          @for (opcion of encargados(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Material
+        <select formControlName="material">
+          <option value="" disabled>Selecciona un material…</option>
+          @for (opcion of materiales(); track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Peso bruto (kg, leído en báscula)
+        <input type="text" inputmode="decimal" formControlName="pesoBruto" placeholder="0.00" />
+      </label>
+
+      <p class="mensaje-ayuda">
+        El peso neto lo calcula el servidor (peso bruto − tara del vehículo); se ve recién después de guardar.
+      </p>
+
+      <label>
+        Descripción (opcional)
+        <input type="text" formControlName="descripcion" />
+      </label>
+
+      <label>
+        Observaciones (opcional)
+        <input type="text" formControlName="observaciones" />
+      </label>
+
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
+
+      <div class="formulario__acciones">
+        <a routerLink="/tickets" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
+</section>

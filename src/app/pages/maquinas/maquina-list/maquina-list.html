@@ -1,0 +1,40 @@
+<section class="maquinas">
+  <header class="listado__header">
+    <h1>Máquinas</h1>
+    <a routerLink="/maquinas/nuevo" class="boton boton--primario">+ Nueva máquina</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando máquinas…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (maquinas().length === 0) {
+    <p>No hay máquinas registradas todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Marca</th>
+          <th>N° de serie</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (maquina of maquinas(); track maquina.id) {
+          <tr>
+            <td>{{ maquina.nombre }}</td>
+            <td>{{ maquina.marca }}</td>
+            <td>{{ maquina.nro_serie }}</td>
+            <td>
+              <a [routerLink]="['/maquinas', maquina.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(maquina)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

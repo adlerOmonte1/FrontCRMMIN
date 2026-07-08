@@ -1,0 +1,40 @@
+<section class="conductores">
+  <header class="listado__header">
+    <h1>Conductores</h1>
+    <a routerLink="/conductores/nuevo" class="boton boton--primario">+ Nuevo conductor</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando conductores…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (conductores().length === 0) {
+    <p>No hay conductores registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Empleado</th>
+          <th>Licencia</th>
+          <th>Tipo de licencia</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (conductor of conductores(); track conductor.id) {
+          <tr>
+            <td>{{ conductor.nombreEmpleado }}</td>
+            <td>{{ conductor.licencia }}</td>
+            <td>{{ conductor.tipoLic }}</td>
+            <td>
+              <a [routerLink]="['/conductores', conductor.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(conductor)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

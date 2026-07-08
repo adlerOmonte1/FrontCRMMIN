@@ -1,41 +1,45 @@
 <section class="empleado-form">
-  <h1>Nuevo empleado</h1>
+  <h1>{{ editando ? 'Editar' : 'Nuevo' }} empleado</h1>
 
-  <form [formGroup]="formulario" (ngSubmit)="guardar()">
-    <label>
-      Nombre
-      <input type="text" formControlName="nombre" />
-    </label>
+  @if (cargandoRegistro()) {
+    <p>Cargando empleado…</p>
+  } @else {
+    <form class="formulario" [formGroup]="formulario" (ngSubmit)="guardar()">
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
 
-    <label>
-      Apellido
-      <input type="text" formControlName="apellido" />
-    </label>
+      <label>
+        Apellido
+        <input type="text" formControlName="apellido" />
+      </label>
 
-    <label>
-      DNI
-      <input type="text" formControlName="dni" maxlength="8" />
-    </label>
+      <label>
+        DNI
+        <input type="text" formControlName="dni" maxlength="8" />
+      </label>
 
-    <label>
-      Edad
-      <input type="number" formControlName="edad" />
-    </label>
+      <label>
+        Edad
+        <input type="number" formControlName="edad" />
+      </label>
 
-    <label>
-      Especialidad
-      <input type="text" formControlName="especialidad" />
-    </label>
+      <label>
+        Especialidad
+        <input type="text" formControlName="especialidad" />
+      </label>
 
-    @if (error()) {
-      <p class="mensaje-error">{{ error() }}</p>
-    }
+      @if (error()) {
+        <p class="mensaje-error">{{ error() }}</p>
+      }
 
-    <div class="empleado-form__acciones">
-      <a routerLink="/empleados" class="boton">Cancelar</a>
-      <button type="submit" class="boton boton--primario" [disabled]="guardando()">
-        {{ guardando() ? 'Guardando…' : 'Guardar' }}
-      </button>
-    </div>
-  </form>
+      <div class="formulario__acciones">
+        <a routerLink="/empleados" class="boton">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  }
 </section>

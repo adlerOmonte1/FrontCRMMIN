@@ -1,0 +1,38 @@
+<section class="encargados">
+  <header class="listado__header">
+    <h1>Encargados</h1>
+    <a routerLink="/encargados/nuevo" class="boton boton--primario">+ Nuevo encargado</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando encargados…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (encargados().length === 0) {
+    <p>No hay encargados registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Empleado</th>
+          <th>Área</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (encargado of encargados(); track encargado.id) {
+          <tr>
+            <td>{{ encargado.nombreEmpleado }}</td>
+            <td>{{ encargado.area }}</td>
+            <td>
+              <a [routerLink]="['/encargados', encargado.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(encargado)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

@@ -1,0 +1,50 @@
+<section class="tickets">
+  <header class="listado__header">
+    <h1>Tickets de pesaje</h1>
+    <a routerLink="/tickets/nuevo" class="boton boton--primario">+ Nuevo ticket</a>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando tickets…</p>
+  } @else if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
+  } @else if (tickets().length === 0) {
+    <p>No hay tickets registrados todavía.</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Fecha emisión</th>
+          <th>Conductor</th>
+          <th>Vehículo</th>
+          <th>Encargado</th>
+          <th>Material</th>
+          <th>Peso bruto</th>
+          <th>Peso neto</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ticket of tickets(); track ticket.id) {
+          <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.fecha_emision | date: 'short' }}</td>
+            <td>{{ ticket.nombreConductor }}</td>
+            <td>{{ ticket.nombreVehiculo }}</td>
+            <td>{{ ticket.nombreEncargado }}</td>
+            <td>{{ ticket.nombreMaterial }}</td>
+            <td>{{ ticket.pesoBruto }}</td>
+            <td>{{ ticket.pesoNeto }}</td>
+            <td>
+              <a [routerLink]="['/tickets', ticket.id, 'editar']" class="boton">Editar</a>
+              <button type="button" class="boton boton--peligro" (click)="eliminar(ticket)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>
