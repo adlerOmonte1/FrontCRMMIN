@@ -28,6 +28,7 @@ flowchart LR
 
 | # | Documento | Contenido |
 |---|---|---|
+| 0 | [Contexto operativo para IA](docs/00-contexto-ia.md) | Punto de entrada para asistentes y mantenedores: dominio, contratos, reglas de negocio, mapa de archivos y metodología de cambio/verificación. |
 | 1 | [Arquitectura del frontend](docs/01-arquitectura-frontend.md) | Capas y carpetas, principios SOLID aplicados con ejemplos concretos, convenciones de nomenclatura, manejo de datos (paginación, decimales, selects con FK) |
 | 2 | [Flujo del código](docs/02-flujo-codigo-frontend.md) | Recorrido línea por línea de una acción real (crear y listar empleados): componente → servicio → interceptor → HTTP → backend |
 | 3 | [Guía del patrón de módulo](docs/03-guia-nuevo-modulo.md) | Receta paso a paso del patrón que siguen los 15 módulos (útil para modificar uno existente o si el backend agrega una entidad nueva), con tabla de referencia completa |

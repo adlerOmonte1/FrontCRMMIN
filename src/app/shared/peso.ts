@@ -6,7 +6,7 @@
 export function kgATon(valorKg: string | number | null | undefined): string {
   const numero = Number(valorKg);
   if (!valorKg || Number.isNaN(numero)) {
-    return '0.000';
+    return '0.00';
   }
   return (numero / 1000).toFixed(3);
 }
